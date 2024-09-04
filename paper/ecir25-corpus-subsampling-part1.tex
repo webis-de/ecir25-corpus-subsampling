@@ -1,0 +1,37 @@
+\section{Introduction}
+
+Unjudged documents are "valuable"
+Prevent overestimation in post-hoc experiments
+But: Unjudged documents introduce computational costs
+Many modern approaches are expensive
+Do we need to process all unjudged documents on for robust evaluations?
+
+
+
+
+Unjudged documents are "valuable"
+Prevent overestimation in post-hoc experiments
+But: Unjudged documents introduce computational costs
+Many modern approaches are expensive
+Do we need to process all unjudged documents on for robust evaluations?
+Example from last week: PLAID SHIRTTT
+Processed 50% of the ClueWeb09 (0.5b English of 1b documents)
+Took 71 days on an NVidia V100 GPU
+Condensed list evaluation: treat unjudged documents as not retrieved
+84366 of 1b documents judged for some query ( 0.01% of the corpus)
+Two frequently applied scenarios:
+Judgment pool only: you overestimate your effectiveness
+Complete corpus: you underestimate your effectiveness
+From the Green IR perspective: Can we find some trade-off in between?
+
+
+Input:
+set of pooled runs
+judgment pool
+Output:
+Subset of the corpus
+Potential subsamples:
+Top-100 or 1000 pool as corpus maybe robust for a top-10 judgment pool?
+Top-100 retrieval pool as corpus: ≥ 90% documents unjudged
+Top-1000 retrieval pool as corpus: ≥ 99% documents unjudged
+They likely cover diverse types of "hard negatives"
