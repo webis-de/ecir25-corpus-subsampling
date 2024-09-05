@@ -1,0 +1,185 @@
+{
+    "trec-system-runs/trec13/robust": {
+        "groups": {
+            "wdo": {"prefix": "input.wdo"},
+            "vtu": {"prefix": "input.vtu"},
+            "uog": {"prefix": "input.uog"},
+            "uic": {"prefix": "input.uic"},
+            "poly": {"prefix": "input.poly"},
+            "pirc": {"prefix": "input.pirc"},
+            "mpi": {"prefix": "input.mpi"},
+            "icl": {"prefix": "input.icl04"},
+            "hum": {"prefix": "input.humR04"},
+            "fub": {"prefix": "input.fub04"},
+            "apl": {"prefix": "input.apl04"},
+            "sab": {"prefix": "input.SABIR04"},
+            "nlp": {"prefix": "input.NLPR04"},
+            "juru": {"prefix": "input.Juru"}
+        },
+        "ir-datasets-id": "disks45/nocr/trec-robust-2004"
+    },
+    "trec-system-runs/trec18/web.adhoc": {
+        "groups": {
+            "yhoou": {"prefix": "input.yhoou"},
+            "wat": {"prefix": "input.wat"},
+            "uva": {"prefix": "input.uva"},
+            "uog": {"prefix": "input.uog"},
+            "umh": {"prefix": "input.UMHOO"},
+            "udw": {"prefix": "input.UDW"},
+            "ude": {"prefix": "input.ude"},
+            "ucds": {"prefix": "input.UCDS"},
+            "uams": {"prefix": "input.Uams"},
+            "tw": {"prefix": "input.tw"},
+            "thuir": {"prefix": "input.THUIR"},
+            "siel": {"prefix": "input.SIEL"},
+            "scut": {"prefix": "input.scutrun"},
+            "sab": {"prefix": "input.Sab"},
+            "rmit": {"prefix": "input.Rmit"},
+            "pku": {"prefix": "input.pku"},
+            "neulm": {"prefix": "input.NeuLM"},
+            "muad": {"prefix": "input.muad"},
+            "ms": {"prefix": "input.MS"},
+            "ie": {"prefix": "input.IE"},
+            "irra": {"prefix": "input.irra"},
+            "ictnet": {"prefix": "input.ICTNET"},
+            "arsc": {"prefix": "input.arsc"}
+        },
+        "ir-datasets-id": "clueweb09/en/trec-web-2009"
+    },
+    "trec-system-runs/trec19/web.adhoc": {
+        "groups": {
+            "york": {"prefix": "input.york"},
+            "utwente": {"prefix": "input.utwente"},
+            "uog": {"prefix": "input.uog"},
+            "umass": {"prefix": "input.umass"},
+            "uma": {"prefix": "input.UMa"},
+            "udel": {"prefix": "input.udel"},
+            "ucdsift": {"prefix": "input.UCDSIFT"},
+            "uams": {"prefix": "input.UAMS"},
+            "thuir": {"prefix": "input.THUIR"},
+            "sztak": {"prefix": "input.sztak"},
+            "msrsv": {"prefix": "input.msrsv"},
+            "mmci": {"prefix": "input.MMCI"},
+            "mf": {"prefix": "input.MF"},
+            "pku": {"prefix": "input.pku"},
+            "ivory": {"prefix": "input.Ivory"},
+            "irra": {"prefix": "input.irra"},
+            "ictnet": {"prefix": "input.ICTNET"},
+            "dfa": {"prefix": "input.DFa"},
+            "cmu": {"prefix": "input.cmu"},
+            "blv": {"prefix": "input.blv"}
+        },
+        "ir-datasets-id": "clueweb09/en/trec-web-2010"
+    },
+    "trec-system-runs/trec20/web.adhoc": {
+        "groups": {
+            "uw": {"prefix": "input.uw"},
+            "uwat": {"prefix": "input.UWat"},
+            "uog": {"prefix": "input.uog"},
+            "umass": {"prefix": "input.umass"},
+            "uams": {"prefix": "input.UAms"},
+            "srchvrs": {"prefix": "input.srchvrs"},
+            "qutir": {"prefix": "input.qutir"},
+            "otago": {"prefix": "input.Otago"},
+            "msrsv": {"prefix": "input.msrsv"},
+            "liaq": {"prefix": "input.liaQ"},
+            "ictnet": {"prefix": "input.ICTNET"},
+            "dfa": {"prefix": "input.DFa"},
+            "bpac": {"prefix": "input.bpac"},
+            "2011": {"prefix": "input.2011"}
+        },
+        "ir-datasets-id": "clueweb09/en/trec-web-2011"
+    },
+    "trec-system-runs/trec21/web.adhoc": {
+        "groups": {
+            "utw": {"prefix": "input.utw"},
+            "uog": {"prefix": "input.uog"},
+            "srchvrs": {"prefix": "input.srchvrs"},
+            "qut": {"prefix": "input.qut"},
+            "lc": {"prefix": "input.lc"},
+            "irra": {"prefix": "input.irra"},
+            "ictnet": {"prefix": "input.ICTNET"},
+            "dmt": {"prefix": "input.DMt"},
+            "dfa": {"prefix": "input.DFa"},
+            "comb": {"prefix": "input.comb"},
+            "auto": {"prefix": "input.auto"},
+            "bpa": {"prefix": "input.2012bpa"}
+        },
+        "ir-datasets-id": "clueweb09/en/trec-web-2012"
+    },
+    "trec-system-runs/trec22/web.adhoc": {
+        "groups": {
+            "wistud": {"prefix": "input.wistud"},
+            "webis": {"prefix": "input.webis"},
+            "ut22": {"prefix": "input.ut22"},
+            "uog": {"prefix": "input.uog"},
+            "ujs": {"prefix": "input.UJS"},
+            "udi": {"prefix": "input.UDI"},
+            "udem": {"prefix": "input.udem"},
+            "udel": {"prefix": "input.udel"},
+            "msr": {"prefix": "input.msr"},
+            "mmr": {"prefix": "input.mmr"},
+            "ictnet": {"prefix": "input.ICTNET"},
+            "dl": {"prefix": "input.dl"},
+            "cwi": {"prefix": "input.cwi"},
+            "clust": {"prefix": "input.clust"}
+        },
+        "ir-datasets-id": "clueweb12/trec-web-2013"
+    },
+    "trec-system-runs/trec23/web.adhoc": {
+        "groups": {
+            "zerg": {"prefix": "input.Zerg"},
+            "wistud": {"prefix": "input.wistud"},
+            "webis": {"prefix": "input.webis"},
+            "ut": {"prefix": "input.ut"},
+            "uog": {"prefix": "input.uog"},
+            "udi": {"prefix": "input.UDI"},
+            "udel": {"prefix": "input.udel"},
+            "terran": {"prefix": "input.Terran"},
+            "snum": {"prefix": "input.SNUM"},
+            "proto": {"prefix": "input.Protos"},
+            "ictnet": {"prefix": "input.ICTNET"},
+            "ciir": {"prefix": "input.Ciir"}
+        },
+        "ir-datasets-id": "clueweb12/trec-web-2014"
+    },
+    "trec-system-runs/trec28/deep.passages": {
+        "groups": {
+            "ict": {"prefix": "input.ICT"},
+            "tua": {"prefix": "input.TUA"},
+            "tuw": {"prefix": "input.TUW"},
+            "unh": {"prefix": "input.UNH"},
+            "bm25": {"prefix": "input.bm25"},
+            "idst": {"prefix": "input.idst"},
+            "p": {"prefix": "input.p"},
+            "run": {"prefix": "input.run"},
+            "srchvrs": {"prefix": "input.srchvrs"},
+            "base": {"prefix": ["input.test1", "input.ms_duet"]}
+        },
+        "ir-datasets-id": "msmarco-passage/trec-dl-2019/judged"
+    },
+    "trec-system-runs/trec29/deep.passages": {
+        "groups": {
+            "num": {"prefix": ["input.1", "input.2"]},
+            "base": {"prefix": ["input.DLH", "input.TF_IDF", "input.BM25", "input.indri", "input.bert"]},
+            "cort": {"prefix": "input.CORT"},
+            "dora": {"prefix": "input.DoRA"},
+            "nle": {"prefix": "input.NLE"},
+            "rmit": {"prefix": "input.RMIT"},
+            "tuw": {"prefix": "input.TUW"},
+            "bcai": {"prefix": "input.bcai"},
+            "bigir": {"prefix": "input.bigIR"},
+            "bl": {"prefix": "input.bl"},
+            "fr": {"prefix": "input.fr"},
+            "med": {"prefix": "input.med"},
+            "nlm": {"prefix": "input.nlm"},
+            "p": {"prefix": "input.p_"},
+            "pash": {"prefix": "input.pash"},
+            "ping": {"prefix": "input.ping"},
+            "r": {"prefix": "input.r"},
+            "small": {"prefix": "input.small_1k.gz"},
+            "terrier": {"prefix": "input.terrier"}
+        },
+        "ir-datasets-id": "msmarco-passage/trec-dl-2020/judged"
+    }
+}
