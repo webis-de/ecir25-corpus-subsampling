@@ -50,7 +50,7 @@ class JudgmentPoolCorpusSampler(CorpusSampler):
         return ret
 
     def __str__(self) -> str:
-        return 'judgment-pool'
+        return "judgment-pool"
 
 
 class RunPoolCorpusSampler(JudgmentPoolCorpusSampler):
@@ -83,7 +83,7 @@ class RunPoolCorpusSampler(JudgmentPoolCorpusSampler):
         return ret
 
     def __str__(self) -> str:
-        return f'top-{self.depth}-run-pool'
+        return f"top-{self.depth}-run-pool"
 
 
 class ReRankCorpusSampler(RunPoolCorpusSampler):
