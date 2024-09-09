@@ -4,6 +4,7 @@ from copy import deepcopy
 from glob import glob
 from pathlib import Path
 
+import pandas as pd
 from tqdm import tqdm
 from trectools import TrecPool, TrecRun
 
@@ -242,6 +243,18 @@ class IncompletePools:
 
         assert skipped_runs == len(runs_to_skip)
         return {k: sorted(list(v)) for k, v in make_top_x_pool(runs_for_pooling, depth).pool.items()}
+
+
+def filter_runs(run: TrecRun, documents: set[str]) -> TrecRun:
+    ret = TrecRun()
+    ret.run_data = []
+
+    for _, i in run.run_data.iterrows():
+        if i["docid"] in documents:
+            ret.run_data += [i.to_dict()]
+
+    ret.run_data = pd.DataFrame(ret.run_data)
+    return ret
 
 
 if __name__ == "__main__":
