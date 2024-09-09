@@ -43,3 +43,15 @@ class TestJudgmentPoolCorpusSampler(unittest.TestCase):
         )
 
         self.assertEqual(expected, actual)
+
+    def test_string_representation_depth_10(self):
+        expected = 'top-10-run-pool'
+        actual = str(RunPoolCorpusSampler(depth=10))
+
+        self.assertEqual(expected, actual)
+
+    def test_string_representation_depth_100(self):
+        expected = 'top-100-run-pool'
+        actual = str(RunPoolCorpusSampler(depth=100))
+
+        self.assertEqual(expected, actual)

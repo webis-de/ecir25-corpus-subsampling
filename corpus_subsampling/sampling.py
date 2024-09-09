@@ -49,6 +49,9 @@ class JudgmentPoolCorpusSampler(CorpusSampler):
 
         return ret
 
+    def __str__(self) -> str:
+        return 'judgment-pool'
+
 
 class RunPoolCorpusSampler(JudgmentPoolCorpusSampler):
     def __init__(self, depth: int):
@@ -78,6 +81,9 @@ class RunPoolCorpusSampler(JudgmentPoolCorpusSampler):
             ret.update(docids)
 
         return ret
+
+    def __str__(self) -> str:
+        return f'top-{self.depth}-run-pool'
 
 
 class ReRankCorpusSampler(RunPoolCorpusSampler):

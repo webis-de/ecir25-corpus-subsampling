@@ -57,3 +57,9 @@ class TestJudgmentPoolCorpusSampler(unittest.TestCase):
         )
 
         self.assertEqual(expected, actual)
+
+    def test_string_representation(self):
+        expected = 'judgment-pool'
+        actual = str(JudgmentPoolCorpusSampler())
+
+        self.assertEqual(expected, actual)
