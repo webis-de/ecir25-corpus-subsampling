@@ -161,7 +161,7 @@
     "trec-system-runs/trec29/deep.passages": {
         "groups": {
             "num": {"prefix": ["input.1", "input.2"]},
-            "base": {"prefix": ["input.DLH", "input.TF_IDF", "input.BM25", "input.indri", "input.bert"]},
+            "base": {"prefix": ["input.DLH", "input.TF_IDF", "input.BM25", "input.indri", "input.bert", "input.bm25_bert"]},
             "cort": {"prefix": "input.CoRT"},
             "dora": {"prefix": "input.DoRA"},
             "nle": {"prefix": "input.NLE"},

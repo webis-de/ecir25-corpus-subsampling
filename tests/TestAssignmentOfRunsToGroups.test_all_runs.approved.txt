@@ -1,0 +1,762 @@
+{
+    "clueweb09/en/trec-web-2009": {
+        "arsc": [
+            "/trec18/web.adhoc/input.arsc09web.gz"
+        ],
+        "ictnet": [
+            "/trec18/web.adhoc/input.ICTNETADRun3.gz",
+            "/trec18/web.adhoc/input.ICTNETADRun5.gz",
+            "/trec18/web.adhoc/input.ICTNETADRun4.gz"
+        ],
+        "ie": [
+            "/trec18/web.adhoc/input.IE09.gz"
+        ],
+        "irra": [
+            "/trec18/web.adhoc/input.irra3a.gz",
+            "/trec18/web.adhoc/input.irra2a.gz",
+            "/trec18/web.adhoc/input.irra1a.gz"
+        ],
+        "ms": [
+            "/trec18/web.adhoc/input.MSRANORM.gz",
+            "/trec18/web.adhoc/input.MS2.gz",
+            "/trec18/web.adhoc/input.MS1.gz",
+            "/trec18/web.adhoc/input.MSRAAF.gz",
+            "/trec18/web.adhoc/input.MSRAC.gz"
+        ],
+        "muad": [
+            "/trec18/web.adhoc/input.muadanchor.gz",
+            "/trec18/web.adhoc/input.muadibm5.gz",
+            "/trec18/web.adhoc/input.muadimp.gz"
+        ],
+        "neulm": [
+            "/trec18/web.adhoc/input.NeuLMWebBase.gz",
+            "/trec18/web.adhoc/input.NeuLMWeb300.gz",
+            "/trec18/web.adhoc/input.NeuLMWeb600.gz"
+        ],
+        "pku": [
+            "/trec18/web.adhoc/input.pkuSewmTp.gz",
+            "/trec18/web.adhoc/input.pkuLink.gz",
+            "/trec18/web.adhoc/input.pkuStruct.gz"
+        ],
+        "rmit": [
+            "/trec18/web.adhoc/input.RmitOkapi.gz",
+            "/trec18/web.adhoc/input.RmitLm.gz"
+        ],
+        "sab": [
+            "/trec18/web.adhoc/input.Sab9wtBf1.gz",
+            "/trec18/web.adhoc/input.Sab9wtBase.gz",
+            "/trec18/web.adhoc/input.Sab9wtBf2.gz"
+        ],
+        "scut": [
+            "/trec18/web.adhoc/input.scutrun2.gz",
+            "/trec18/web.adhoc/input.scutrun3.gz",
+            "/trec18/web.adhoc/input.scutrun1.gz"
+        ],
+        "siel": [
+            "/trec18/web.adhoc/input.SIEL09.gz"
+        ],
+        "thuir": [
+            "/trec18/web.adhoc/input.THUIR09LuTA.gz",
+            "/trec18/web.adhoc/input.THUIR09An.gz",
+            "/trec18/web.adhoc/input.THUIR09TxAn.gz"
+        ],
+        "tw": [
+            "/trec18/web.adhoc/input.twCSrs9N.gz",
+            "/trec18/web.adhoc/input.twJ48rsU.gz",
+            "/trec18/web.adhoc/input.twCSrsR.gz"
+        ],
+        "uams": [
+            "/trec18/web.adhoc/input.UamsAwebQE10.gz",
+            "/trec18/web.adhoc/input.UamsAw7an3.gz"
+        ],
+        "ucds": [
+            "/trec18/web.adhoc/input.UCDSIFTslide.gz",
+            "/trec18/web.adhoc/input.UCDSIFTinter.gz",
+            "/trec18/web.adhoc/input.UCDSIFTprob.gz"
+        ],
+        "ude": [
+            "/trec18/web.adhoc/input.udelIndDRPR.gz",
+            "/trec18/web.adhoc/input.udelIndDRSP.gz",
+            "/trec18/web.adhoc/input.udelIndDMRM.gz"
+        ],
+        "udw": [
+            "/trec18/web.adhoc/input.UDWAxBL.gz",
+            "/trec18/web.adhoc/input.UDWAxQE.gz",
+            "/trec18/web.adhoc/input.UDWAxQEWeb.gz"
+        ],
+        "umh": [
+            "/trec18/web.adhoc/input.UMHOObm25GS.gz",
+            "/trec18/web.adhoc/input.UMHOOsd.gz",
+            "/trec18/web.adhoc/input.UMHOOqlIF.gz",
+            "/trec18/web.adhoc/input.UMHOOqlB.gz",
+            "/trec18/web.adhoc/input.UMHOObm25IF.gz",
+            "/trec18/web.adhoc/input.UMHOOsdp.gz",
+            "/trec18/web.adhoc/input.UMHOObm25B.gz",
+            "/trec18/web.adhoc/input.UMHOOqlGS.gz"
+        ],
+        "uog": [
+            "/trec18/web.adhoc/input.uogTrdphA.gz",
+            "/trec18/web.adhoc/input.uogTrdphP.gz",
+            "/trec18/web.adhoc/input.uogTrdphCEwP.gz"
+        ],
+        "uva": [
+            "/trec18/web.adhoc/input.uvamrf.gz",
+            "/trec18/web.adhoc/input.uvamrftop.gz",
+            "/trec18/web.adhoc/input.uvaee.gz"
+        ],
+        "wat": [
+            "/trec18/web.adhoc/input.watprf.gz",
+            "/trec18/web.adhoc/input.WatSql.gz",
+            "/trec18/web.adhoc/input.WatSdmrm3we.gz",
+            "/trec18/web.adhoc/input.watrrfw.gz",
+            "/trec18/web.adhoc/input.watwp.gz",
+            "/trec18/web.adhoc/input.WatSdmrm3.gz"
+        ],
+        "yhoou": [
+            "/trec18/web.adhoc/input.yhooumd09BGM.gz",
+            "/trec18/web.adhoc/input.yhooumd09BFM.gz",
+            "/trec18/web.adhoc/input.yhooumd09BGC.gz"
+        ]
+    },
+    "clueweb09/en/trec-web-2010": {
+        "blv": [
+            "/trec19/web.adhoc/input.blv79y00shnk.gz",
+            "/trec19/web.adhoc/input.blv79y00prob.gz"
+        ],
+        "cmu": [
+            "/trec19/web.adhoc/input.cmuWiki10.gz",
+            "/trec19/web.adhoc/input.cmuBase10.gz",
+            "/trec19/web.adhoc/input.cmuFuTop10.gz"
+        ],
+        "dfa": [
+            "/trec19/web.adhoc/input.DFalah2010.gz"
+        ],
+        "ictnet": [
+            "/trec19/web.adhoc/input.ICTNETAD10R2.gz",
+            "/trec19/web.adhoc/input.ICTNETAD10R3.gz",
+            "/trec19/web.adhoc/input.ICTNETAD10R1.gz"
+        ],
+        "irra": [
+            "/trec19/web.adhoc/input.irra10b.gz",
+            "/trec19/web.adhoc/input.irra10rob.gz",
+            "/trec19/web.adhoc/input.irra10hp.gz"
+        ],
+        "ivory": [
+            "/trec19/web.adhoc/input.IvoryWSDa.gz",
+            "/trec19/web.adhoc/input.IvoryWSDb.gz",
+            "/trec19/web.adhoc/input.IvoryBM25a.gz",
+            "/trec19/web.adhoc/input.IvoryL2Rb.gz",
+            "/trec19/web.adhoc/input.IvorySDa.gz",
+            "/trec19/web.adhoc/input.IvoryLCEb.gz"
+        ],
+        "mf": [
+            "/trec19/web.adhoc/input.MF2.gz",
+            "/trec19/web.adhoc/input.MF1.gz"
+        ],
+        "mmci": [
+            "/trec19/web.adhoc/input.MMCITLl20M.gz",
+            "/trec19/web.adhoc/input.MMCIl410m1.gz",
+            "/trec19/web.adhoc/input.MMCITLCLl20M.gz"
+        ],
+        "msrsv": [
+            "/trec19/web.adhoc/input.msrsv1.gz",
+            "/trec19/web.adhoc/input.msrsv3.gz",
+            "/trec19/web.adhoc/input.msrsv2.gz"
+        ],
+        "pku": [
+            "/trec19/web.adhoc/input.pkusewm1.gz"
+        ],
+        "sztak": [
+            "/trec19/web.adhoc/input.sztaki1.gz"
+        ],
+        "thuir": [
+            "/trec19/web.adhoc/input.THUIR10Str.gz",
+            "/trec19/web.adhoc/input.THUIR10QaHt.gz",
+            "/trec19/web.adhoc/input.THUIR10Qa.gz"
+        ],
+        "uams": [
+            "/trec19/web.adhoc/input.UAMSA10d2a8.gz",
+            "/trec19/web.adhoc/input.UAMSA10mSF30.gz",
+            "/trec19/web.adhoc/input.UAMSA10mSFPR.gz"
+        ],
+        "ucdsift": [
+            "/trec19/web.adhoc/input.UCDSIFTProb.gz",
+            "/trec19/web.adhoc/input.UCDSIFTSlide.gz",
+            "/trec19/web.adhoc/input.UCDSIFTMAP.gz"
+        ],
+        "udel": [
+            "/trec19/web.adhoc/input.udelIndriWP.gz",
+            "/trec19/web.adhoc/input.udelIndriB2.gz",
+            "/trec19/web.adhoc/input.udelIndriB.gz"
+        ],
+        "uma": [
+            "/trec19/web.adhoc/input.UMa10BASF.gz",
+            "/trec19/web.adhoc/input.UMa10BSF.gz",
+            "/trec19/web.adhoc/input.UMa10IASF.gz"
+        ],
+        "umass": [
+            "/trec19/web.adhoc/input.umassSDM.gz",
+            "/trec19/web.adhoc/input.umassSDMW.gz",
+            "/trec19/web.adhoc/input.umasswfb520.gz"
+        ],
+        "uog": [
+            "/trec19/web.adhoc/input.uogTrB67LTS.gz",
+            "/trec19/web.adhoc/input.uogTrA40n.gz",
+            "/trec19/web.adhoc/input.uogTrB67.gz",
+            "/trec19/web.adhoc/input.uogTrA42.gz"
+        ],
+        "utwente": [
+            "/trec19/web.adhoc/input.utwente4.gz",
+            "/trec19/web.adhoc/input.utwente4SF.gz",
+            "/trec19/web.adhoc/input.utwente3.gz"
+        ],
+        "york": [
+            "/trec19/web.adhoc/input.york10wA2.gz",
+            "/trec19/web.adhoc/input.york10wA1.gz",
+            "/trec19/web.adhoc/input.york10wA3.gz"
+        ]
+    },
+    "clueweb09/en/trec-web-2011": {
+        "2011": [
+            "/trec20/web.adhoc/input.2011SiftR3.gz",
+            "/trec20/web.adhoc/input.2011SiftR1.gz",
+            "/trec20/web.adhoc/input.2011SiftR2.gz"
+        ],
+        "bpac": [
+            "/trec20/web.adhoc/input.bpacadspam1.gz",
+            "/trec20/web.adhoc/input.bpacad1.gz",
+            "/trec20/web.adhoc/input.bpacadspam2.gz"
+        ],
+        "dfa": [
+            "/trec20/web.adhoc/input.DFalah11.gz"
+        ],
+        "ictnet": [
+            "/trec20/web.adhoc/input.ICTNET11ADR4.gz",
+            "/trec20/web.adhoc/input.ICTNET11ADR3.gz",
+            "/trec20/web.adhoc/input.ICTNET11ADR2.gz"
+        ],
+        "liaq": [
+            "/trec20/web.adhoc/input.liaQEWikiA.gz",
+            "/trec20/web.adhoc/input.liaQEWikiGoo.gz",
+            "/trec20/web.adhoc/input.liaQEWikiGoA.gz"
+        ],
+        "msrsv": [
+            "/trec20/web.adhoc/input.msrsv2011a3.gz",
+            "/trec20/web.adhoc/input.msrsv2011a2.gz",
+            "/trec20/web.adhoc/input.msrsv2011a1.gz"
+        ],
+        "otago": [
+            "/trec20/web.adhoc/input.Otago2011cnw.gz",
+            "/trec20/web.adhoc/input.Otago2011cn.gz"
+        ],
+        "qutir": [
+            "/trec20/web.adhoc/input.qutir11b.gz",
+            "/trec20/web.adhoc/input.qutir11a.gz"
+        ],
+        "srchvrs": [
+            "/trec20/web.adhoc/input.srchvrs11o.gz",
+            "/trec20/web.adhoc/input.srchvrs11b.gz"
+        ],
+        "uams": [
+            "/trec20/web.adhoc/input.UAmsM705FLS.gz",
+            "/trec20/web.adhoc/input.UAmsM705tiLS.gz",
+            "/trec20/web.adhoc/input.UAmsT05FLS.gz"
+        ],
+        "umass": [
+            "/trec20/web.adhoc/input.umassGQdist.gz",
+            "/trec20/web.adhoc/input.umassIFuse.gz",
+            "/trec20/web.adhoc/input.umassGFuse.gz"
+        ],
+        "uog": [
+            "/trec20/web.adhoc/input.uogTrA45Vm.gz",
+            "/trec20/web.adhoc/input.uogTrA45Nm.gz",
+            "/trec20/web.adhoc/input.uogTrB47Vm.gz"
+        ],
+        "uw": [
+            "/trec20/web.adhoc/input.uwBAadhoc.gz",
+            "/trec20/web.adhoc/input.uwExpAadhoc.gz",
+            "/trec20/web.adhoc/input.uwBBadhoc.gz"
+        ],
+        "uwat": [
+            "/trec20/web.adhoc/input.UWatMDSql.gz",
+            "/trec20/web.adhoc/input.UWatMDSdm.gz",
+            "/trec20/web.adhoc/input.UWatMDSqlt.gz"
+        ]
+    },
+    "clueweb09/en/trec-web-2012": {
+        "auto": [
+            "/trec21/web.adhoc/input.autoSTB.gz"
+        ],
+        "bpa": [
+            "/trec21/web.adhoc/input.2012bpacad4.gz",
+            "/trec21/web.adhoc/input.2012bpacad8.gz",
+            "/trec21/web.adhoc/input.2012bpacad4h.gz"
+        ],
+        "comb": [
+            "/trec21/web.adhoc/input.combMNZCatB.gz"
+        ],
+        "dfa": [
+            "/trec21/web.adhoc/input.DFalah120A.gz",
+            "/trec21/web.adhoc/input.DFalah121A.gz"
+        ],
+        "dmt": [
+            "/trec21/web.adhoc/input.DMthbCatB.gz",
+            "/trec21/web.adhoc/input.DMthbCatASP.gz"
+        ],
+        "ictnet": [
+            "/trec21/web.adhoc/input.ICTNET12ADR2.gz",
+            "/trec21/web.adhoc/input.ICTNET12ADR1.gz",
+            "/trec21/web.adhoc/input.ICTNET12ADR3.gz"
+        ],
+        "irra": [
+            "/trec21/web.adhoc/input.irra12a.gz",
+            "/trec21/web.adhoc/input.irra12b.gz",
+            "/trec21/web.adhoc/input.irra12c.gz"
+        ],
+        "lc": [
+            "/trec21/web.adhoc/input.lcm4res.gz",
+            "/trec21/web.adhoc/input.lcmweb.gz",
+            "/trec21/web.adhoc/input.lcmweb10p.gz",
+            "/trec21/web.adhoc/input.lcmwebnoW.gz"
+        ],
+        "qut": [
+            "/trec21/web.adhoc/input.QUTparaTQEg1.gz",
+            "/trec21/web.adhoc/input.QUTparaBline.gz",
+            "/trec21/web.adhoc/input.qutwb.gz",
+            "/trec21/web.adhoc/input.qutwa.gz"
+        ],
+        "srchvrs": [
+            "/trec21/web.adhoc/input.srchvrs12c09.gz"
+        ],
+        "uog": [
+            "/trec21/web.adhoc/input.uogTrA44s9.gz",
+            "/trec21/web.adhoc/input.uogTrA44xi.gz",
+            "/trec21/web.adhoc/input.uogTrA44xl.gz",
+            "/trec21/web.adhoc/input.uogTrB45aIs.gz"
+        ],
+        "utw": [
+            "/trec21/web.adhoc/input.utw2012fc1.gz",
+            "/trec21/web.adhoc/input.utw2012lm09.gz",
+            "/trec21/web.adhoc/input.utw2012c2.gz",
+            "/trec21/web.adhoc/input.utw2012lda.gz"
+        ]
+    },
+    "clueweb12/trec-web-2013": {
+        "clust": [
+            "/trec22/web.adhoc/input.clustmrfaf.gz",
+            "/trec22/web.adhoc/input.clustmrfbf.gz"
+        ],
+        "cwi": [
+            "/trec22/web.adhoc/input.cwiwt13cps.gz",
+            "/trec22/web.adhoc/input.cwiwt13cpe.gz",
+            "/trec22/web.adhoc/input.cwiwt13kld.gz"
+        ],
+        "dl": [
+            "/trec22/web.adhoc/input.dlde.gz"
+        ],
+        "ictnet": [
+            "/trec22/web.adhoc/input.ICTNET13ADR3.gz",
+            "/trec22/web.adhoc/input.ICTNET13ADR2.gz",
+            "/trec22/web.adhoc/input.ICTNET13ADR1.gz"
+        ],
+        "mmr": [
+            "/trec22/web.adhoc/input.mmrbf.gz"
+        ],
+        "msr": [
+            "/trec22/web.adhoc/input.msr_alpha0_95_4.gz",
+            "/trec22/web.adhoc/input.msr_alpha0.gz"
+        ],
+        "udel": [
+            "/trec22/web.adhoc/input.udelPseudo1.gz",
+            "/trec22/web.adhoc/input.udelCombUD.gz",
+            "/trec22/web.adhoc/input.udelPseudo2.gz"
+        ],
+        "udem": [
+            "/trec22/web.adhoc/input.udemQlm1lFb.gz",
+            "/trec22/web.adhoc/input.udemQlm1l.gz",
+            "/trec22/web.adhoc/input.udemQlm1lFbWiki.gz"
+        ],
+        "udi": [
+            "/trec22/web.adhoc/input.UDInfolabWEB2.gz",
+            "/trec22/web.adhoc/input.UDInfolabWEB1.gz"
+        ],
+        "ujs": [
+            "/trec22/web.adhoc/input.UJS13LCRAd1.gz",
+            "/trec22/web.adhoc/input.UJS13LCRAd2.gz"
+        ],
+        "uog": [
+            "/trec22/web.adhoc/input.uogTrBDnLmxw.gz",
+            "/trec22/web.adhoc/input.uogTrAS2Lb.gz",
+            "/trec22/web.adhoc/input.uogTrAIwLmb.gz"
+        ],
+        "ut22": [
+            "/trec22/web.adhoc/input.ut22base.gz",
+            "/trec22/web.adhoc/input.ut22xact.gz",
+            "/trec22/web.adhoc/input.ut22spam.gz"
+        ],
+        "webis": [
+            "/trec22/web.adhoc/input.webismixed.gz",
+            "/trec22/web.adhoc/input.webisrandom.gz",
+            "/trec22/web.adhoc/input.webiswtbaseline.gz"
+        ],
+        "wistud": [
+            "/trec22/web.adhoc/input.wistud.runB.gz",
+            "/trec22/web.adhoc/input.wistud.runC.gz",
+            "/trec22/web.adhoc/input.wistud.runA.gz"
+        ]
+    },
+    "clueweb12/trec-web-2014": {
+        "ciir": [
+            "/trec23/web.adhoc/input.CiirSub1.gz",
+            "/trec23/web.adhoc/input.CiirAll1.gz",
+            "/trec23/web.adhoc/input.CiirSdm.gz",
+            "/trec23/web.adhoc/input.CiirWikiRm.gz",
+            "/trec23/web.adhoc/input.CiirSub2.gz"
+        ],
+        "ictnet": [
+            "/trec23/web.adhoc/input.ICTNET14ADR3.gz",
+            "/trec23/web.adhoc/input.ICTNET14ADR2.gz",
+            "/trec23/web.adhoc/input.ICTNET14ADR1.gz"
+        ],
+        "proto": [
+            "/trec23/web.adhoc/input.Protoss.gz"
+        ],
+        "snum": [
+            "/trec23/web.adhoc/input.SNUMedinfo11.gz",
+            "/trec23/web.adhoc/input.SNUMedinfo12.gz",
+            "/trec23/web.adhoc/input.SNUMedinfo13.gz"
+        ],
+        "terran": [
+            "/trec23/web.adhoc/input.Terran.gz"
+        ],
+        "udel": [
+            "/trec23/web.adhoc/input.udel_itub.gz",
+            "/trec23/web.adhoc/input.udel_itu.gz"
+        ],
+        "udi": [
+            "/trec23/web.adhoc/input.UDInfoWebLES.gz",
+            "/trec23/web.adhoc/input.UDInfoWebENT.gz",
+            "/trec23/web.adhoc/input.UDInfoWebAX.gz"
+        ],
+        "uog": [
+            "/trec23/web.adhoc/input.uogTrDuax.gz",
+            "/trec23/web.adhoc/input.uogTrDwl.gz",
+            "/trec23/web.adhoc/input.uogTrIwa.gz"
+        ],
+        "ut": [
+            "/trec23/web.adhoc/input.utbase.gz",
+            "/trec23/web.adhoc/input.utexact.gz"
+        ],
+        "webis": [
+            "/trec23/web.adhoc/input.webisWt14axAll.gz",
+            "/trec23/web.adhoc/input.webisWt14axMax.gz",
+            "/trec23/web.adhoc/input.webisWt14axSyn.gz"
+        ],
+        "wistud": [
+            "/trec23/web.adhoc/input.wistud.runB.gz",
+            "/trec23/web.adhoc/input.wistud.runC.gz",
+            "/trec23/web.adhoc/input.wistud.runA.gz"
+        ],
+        "zerg": [
+            "/trec23/web.adhoc/input.Zerg.gz"
+        ]
+    },
+    "disks45/nocr/trec-robust-2004": {
+        "apl": [
+            "/trec13/robust/input.apl04rsDw.gz",
+            "/trec13/robust/input.apl04rsTs.gz",
+            "/trec13/robust/input.apl04rsTDNfw.gz",
+            "/trec13/robust/input.apl04rsTw.gz",
+            "/trec13/robust/input.apl04rsTDNw5.gz"
+        ],
+        "fub": [
+            "/trec13/robust/input.fub04TDNe.gz",
+            "/trec13/robust/input.fub04Dge.gz",
+            "/trec13/robust/input.fub04De.gz",
+            "/trec13/robust/input.fub04TDNg.gz",
+            "/trec13/robust/input.fub04TDNge.gz",
+            "/trec13/robust/input.fub04Te.gz",
+            "/trec13/robust/input.fub04Tge.gz",
+            "/trec13/robust/input.fub04Dg.gz",
+            "/trec13/robust/input.fub04T2ge.gz",
+            "/trec13/robust/input.fub04Tg.gz"
+        ],
+        "hum": [
+            "/trec13/robust/input.humR04t5e1.gz",
+            "/trec13/robust/input.humR04d5m.gz",
+            "/trec13/robust/input.humR04d5.gz",
+            "/trec13/robust/input.humR04t5.gz",
+            "/trec13/robust/input.humR04t1i.gz",
+            "/trec13/robust/input.humR04t1.gz",
+            "/trec13/robust/input.humR04d4e5.gz",
+            "/trec13/robust/input.humR04d4.gz",
+            "/trec13/robust/input.humR04d5i.gz",
+            "/trec13/robust/input.humR04t1m.gz"
+        ],
+        "icl": [
+            "/trec13/robust/input.icl04pos2d.gz",
+            "/trec13/robust/input.icl04pos7tap.gz",
+            "/trec13/robust/input.icl04pos2f.gz",
+            "/trec13/robust/input.icl04pos2t.gz",
+            "/trec13/robust/input.icl04pos7td.gz",
+            "/trec13/robust/input.icl04pos7f.gz",
+            "/trec13/robust/input.icl04pos48f.gz",
+            "/trec13/robust/input.icl04pos2td.gz",
+            "/trec13/robust/input.icl04pos7tat.gz"
+        ],
+        "juru": [
+            "/trec13/robust/input.JuruDes.gz",
+            "/trec13/robust/input.JuruDesLaMd.gz",
+            "/trec13/robust/input.JuruDesSwQE.gz",
+            "/trec13/robust/input.JuruDesTrSl.gz",
+            "/trec13/robust/input.JuruDesAggr.gz",
+            "/trec13/robust/input.JuruTitDes.gz",
+            "/trec13/robust/input.JuruTitSwQE.gz",
+            "/trec13/robust/input.JuruTitSwDs.gz",
+            "/trec13/robust/input.JuruDesQE.gz",
+            "/trec13/robust/input.JuruTit.gz"
+        ],
+        "mpi": [
+            "/trec13/robust/input.mpi04r04.gz",
+            "/trec13/robust/input.mpi04r02.gz",
+            "/trec13/robust/input.mpi04r05.gz",
+            "/trec13/robust/input.mpi04r08.gz",
+            "/trec13/robust/input.mpi04r10.gz",
+            "/trec13/robust/input.mpi04r09.gz",
+            "/trec13/robust/input.mpi04r01.gz",
+            "/trec13/robust/input.mpi04r06.gz",
+            "/trec13/robust/input.mpi04r07.gz",
+            "/trec13/robust/input.mpi04r11.gz"
+        ],
+        "nlp": [
+            "/trec13/robust/input.NLPR04SemLM.gz",
+            "/trec13/robust/input.NLPR04OKapi.gz",
+            "/trec13/robust/input.NLPR04okdiv.gz",
+            "/trec13/robust/input.NLPR04COMB.gz",
+            "/trec13/robust/input.NLPR04clus9.gz",
+            "/trec13/robust/input.NLPR04oktwo.gz",
+            "/trec13/robust/input.NLPR04LMts.gz",
+            "/trec13/robust/input.NLPR04okall.gz",
+            "/trec13/robust/input.NLPR04clus10.gz",
+            "/trec13/robust/input.NLPR04LcA.gz",
+            "/trec13/robust/input.NLPR04NcA.gz"
+        ],
+        "pirc": [
+            "/trec13/robust/input.pircRB04t2.gz",
+            "/trec13/robust/input.pircRB04t1.gz",
+            "/trec13/robust/input.pircRB04t3.gz",
+            "/trec13/robust/input.pircRB04d3.gz",
+            "/trec13/robust/input.pircRB04d4.gz",
+            "/trec13/robust/input.pircRB04td2.gz",
+            "/trec13/robust/input.pircRB04d2.gz",
+            "/trec13/robust/input.pircRB04d5.gz",
+            "/trec13/robust/input.pircRB04td3.gz",
+            "/trec13/robust/input.pircRB04t4.gz"
+        ],
+        "poly": [
+            "/trec13/robust/input.polyudp4.gz",
+            "/trec13/robust/input.polyudp6.gz",
+            "/trec13/robust/input.polyudp2.gz",
+            "/trec13/robust/input.polyutp1.gz",
+            "/trec13/robust/input.polyutp3.gz",
+            "/trec13/robust/input.polyudp5.gz"
+        ],
+        "sab": [
+            "/trec13/robust/input.SABIR04FT.gz",
+            "/trec13/robust/input.SABIR04BA.gz",
+            "/trec13/robust/input.SABIR04BT.gz",
+            "/trec13/robust/input.SABIR04BD.gz",
+            "/trec13/robust/input.SABIR04FA.gz",
+            "/trec13/robust/input.SABIR04FD.gz"
+        ],
+        "uic": [
+            "/trec13/robust/input.uic0401.gz"
+        ],
+        "uog": [
+            "/trec13/robust/input.uogRobDBase.gz",
+            "/trec13/robust/input.uogRobSBase.gz",
+            "/trec13/robust/input.uogRobDWR5.gz",
+            "/trec13/robust/input.uogRobSWR5.gz",
+            "/trec13/robust/input.uogRobLWR5.gz",
+            "/trec13/robust/input.uogRobDWR10.gz",
+            "/trec13/robust/input.uogRobLWR10.gz",
+            "/trec13/robust/input.uogRobSWR10.gz",
+            "/trec13/robust/input.uogRobLBase.gz",
+            "/trec13/robust/input.uogRobLT.gz"
+        ],
+        "vtu": [
+            "/trec13/robust/input.vtumdesc.gz",
+            "/trec13/robust/input.vtumlong252.gz",
+            "/trec13/robust/input.vtumtitle.gz",
+            "/trec13/robust/input.vtumlong254.gz",
+            "/trec13/robust/input.vtumlong344.gz",
+            "/trec13/robust/input.vtumlong348.gz",
+            "/trec13/robust/input.vtumlong432.gz",
+            "/trec13/robust/input.vtumlong436.gz"
+        ],
+        "wdo": [
+            "/trec13/robust/input.wdoqdn1.gz",
+            "/trec13/robust/input.wdoqsn1.gz",
+            "/trec13/robust/input.wdoqla1.gz",
+            "/trec13/robust/input.wdo25qla1.gz"
+        ]
+    },
+    "msmarco-passage/trec-dl-2019/judged": {
+        "base": [
+            "/trec28/deep.passages/input.ms_duet_passage.gz",
+            "/trec28/deep.passages/input.test1.gz"
+        ],
+        "bm25": [
+            "/trec28/deep.passages/input.bm25tuned_rm3_p.gz",
+            "/trec28/deep.passages/input.bm25base_p.gz",
+            "/trec28/deep.passages/input.bm25base_prf_p.gz",
+            "/trec28/deep.passages/input.bm25tuned_p.gz",
+            "/trec28/deep.passages/input.bm25base_ax_p.gz",
+            "/trec28/deep.passages/input.bm25tuned_ax_p.gz",
+            "/trec28/deep.passages/input.bm25base_rm3_p.gz",
+            "/trec28/deep.passages/input.bm25tuned_prf_p.gz"
+        ],
+        "ict": [
+            "/trec28/deep.passages/input.ICT-CKNRM_B50.gz",
+            "/trec28/deep.passages/input.ICT-CKNRM_B.gz",
+            "/trec28/deep.passages/input.ICT-BERT2.gz"
+        ],
+        "idst": [
+            "/trec28/deep.passages/input.idst_bert_pr1.gz",
+            "/trec28/deep.passages/input.idst_bert_p3.gz",
+            "/trec28/deep.passages/input.idst_bert_p2.gz",
+            "/trec28/deep.passages/input.idst_bert_p1.gz",
+            "/trec28/deep.passages/input.idst_bert_pr2.gz"
+        ],
+        "p": [
+            "/trec28/deep.passages/input.p_bert.gz",
+            "/trec28/deep.passages/input.p_exp_rm3_bert.gz",
+            "/trec28/deep.passages/input.p_exp_bert.gz"
+        ],
+        "run": [
+            "/trec28/deep.passages/input.runid3.gz",
+            "/trec28/deep.passages/input.runid2.gz",
+            "/trec28/deep.passages/input.runid5.gz",
+            "/trec28/deep.passages/input.runid4.gz"
+        ],
+        "srchvrs": [
+            "/trec28/deep.passages/input.srchvrs_ps_run3.gz",
+            "/trec28/deep.passages/input.srchvrs_ps_run2.gz",
+            "/trec28/deep.passages/input.srchvrs_ps_run1.gz"
+        ],
+        "tua": [
+            "/trec28/deep.passages/input.TUA1-1.gz"
+        ],
+        "tuw": [
+            "/trec28/deep.passages/input.TUW19-p2-f.gz",
+            "/trec28/deep.passages/input.TUW19-p3-f.gz",
+            "/trec28/deep.passages/input.TUW19-p2-re.gz",
+            "/trec28/deep.passages/input.TUW19-p3-re.gz",
+            "/trec28/deep.passages/input.TUW19-p1-f.gz",
+            "/trec28/deep.passages/input.TUW19-p1-re.gz"
+        ],
+        "unh": [
+            "/trec28/deep.passages/input.UNH_exDL_bm25.gz",
+            "/trec28/deep.passages/input.UNH_bm25.gz"
+        ]
+    },
+    "msmarco-passage/trec-dl-2020/judged": {
+        "base": [
+            "/trec29/deep.passages/input.bert_6.gz",
+            "/trec29/deep.passages/input.indri-fdm.gz",
+            "/trec29/deep.passages/input.bm25_bert_token.gz",
+            "/trec29/deep.passages/input.DLH_d_5_t_25.gz",
+            "/trec29/deep.passages/input.indri-sdm.gz",
+            "/trec29/deep.passages/input.indri-lmds.gz",
+            "/trec29/deep.passages/input.TF_IDF_d_2_t_50.gz"
+        ],
+        "bcai": [
+            "/trec29/deep.passages/input.bcai_class_pass.gz",
+            "/trec29/deep.passages/input.bcai_bertl_pass.gz"
+        ],
+        "bigir": [
+            "/trec29/deep.passages/input.bigIR-T5-BERT-F.gz",
+            "/trec29/deep.passages/input.bigIR-BERT-R.gz",
+            "/trec29/deep.passages/input.bigIR-T5-R.gz",
+            "/trec29/deep.passages/input.bigIR-T5xp-T5-F.gz",
+            "/trec29/deep.passages/input.bigIR-DCT-T5-F.gz"
+        ],
+        "bl": [
+            "/trec29/deep.passages/input.bl_bcai_mdl1_vt.gz",
+            "/trec29/deep.passages/input.bl_bcai_mdl1_vs.gz"
+        ],
+        "cort": [
+            "/trec29/deep.passages/input.CoRT-electra.gz",
+            "/trec29/deep.passages/input.CoRT-bm25.gz",
+            "/trec29/deep.passages/input.CoRT-standalone.gz"
+        ],
+        "dora": [
+            "/trec29/deep.passages/input.DoRA_Small.gz",
+            "/trec29/deep.passages/input.DoRA_Large_1k.gz",
+            "/trec29/deep.passages/input.DoRA_Large.gz",
+            "/trec29/deep.passages/input.DoRA_Med.gz"
+        ],
+        "fr": [
+            "/trec29/deep.passages/input.fr_pass_roberta.gz"
+        ],
+        "med": [
+            "/trec29/deep.passages/input.med_1k.gz"
+        ],
+        "nle": [
+            "/trec29/deep.passages/input.NLE_pr3.gz",
+            "/trec29/deep.passages/input.NLE_pr1.gz",
+            "/trec29/deep.passages/input.NLE_pr2.gz"
+        ],
+        "nlm": [
+            "/trec29/deep.passages/input.nlm-ens-bst-3.gz",
+            "/trec29/deep.passages/input.nlm-prfun-bert.gz",
+            "/trec29/deep.passages/input.nlm-ens-bst-2.gz",
+            "/trec29/deep.passages/input.nlm-bert-rr.gz"
+        ],
+        "num": [
+            "/trec29/deep.passages/input.1.gz",
+            "/trec29/deep.passages/input.2.gz"
+        ],
+        "p": [
+            "/trec29/deep.passages/input.p_d2q_bm25_duo.gz",
+            "/trec29/deep.passages/input.p_d2q_bm25.gz",
+            "/trec29/deep.passages/input.p_d2q_rm3_duo.gz",
+            "/trec29/deep.passages/input.p_bm25rm3_duo.gz",
+            "/trec29/deep.passages/input.p_bm25rm3.gz",
+            "/trec29/deep.passages/input.p_bm25.gz",
+            "/trec29/deep.passages/input.p_d2q_bm25rm3.gz"
+        ],
+        "pash": [
+            "/trec29/deep.passages/input.pash_r1.gz",
+            "/trec29/deep.passages/input.pash_f2.gz",
+            "/trec29/deep.passages/input.pash_f3.gz",
+            "/trec29/deep.passages/input.pash_r2.gz",
+            "/trec29/deep.passages/input.pash_f1.gz",
+            "/trec29/deep.passages/input.pash_r3.gz"
+        ],
+        "ping": [
+            "/trec29/deep.passages/input.pinganNLP3.gz",
+            "/trec29/deep.passages/input.pinganNLP1.gz",
+            "/trec29/deep.passages/input.pinganNLP2.gz"
+        ],
+        "r": [
+            "/trec29/deep.passages/input.rr-pass-roberta.gz",
+            "/trec29/deep.passages/input.relemb_mlm_0_2.gz"
+        ],
+        "rmit": [
+            "/trec29/deep.passages/input.RMIT-Bart.gz"
+        ],
+        "small": [
+            "/trec29/deep.passages/input.small_1k.gz"
+        ],
+        "terrier": [
+            "/trec29/deep.passages/input.terrier-InL2.gz",
+            "/trec29/deep.passages/input.terrier-DPH.gz",
+            "/trec29/deep.passages/input.terrier-BM25.gz"
+        ],
+        "tuw": [
+            "/trec29/deep.passages/input.TUW-TK-2Layer.gz",
+            "/trec29/deep.passages/input.TUW-TK-Sparse.gz"
+        ]
+    }
+}

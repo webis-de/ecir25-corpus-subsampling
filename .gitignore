@@ -3,4 +3,6 @@ paper/ecir25-corpus-subsampling-frame.log
 paper/ecir25-corpus-subsampling-frame.pdf
 paper/ecir25-corpus-subsampling-frame.bbl
 paper/ecir25-corpus-subsampling-frame.blg
+*.pyc
+*egg-info
 __pycache__
