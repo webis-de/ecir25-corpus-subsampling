@@ -7,7 +7,7 @@ import pandas as pd
 from tqdm import tqdm
 from trectools import TrecEval, TrecQrel, TrecRun
 
-from corpus_subsampling.run_files import IR_DATASET_IDS, Runs
+from corpus_subsampling.run_files import IR_DATASET_IDS, Runs, filter_runs
 from corpus_subsampling.sampling import JudgmentPoolCorpusSampler, RunPoolCorpusSampler
 
 RUN_FILE_CACHE = {}
@@ -22,13 +22,24 @@ def load_run_file(run_file_name: str) -> TrecRun:
     return RUN_FILE_CACHE[run_file_name]
 
 
+def runs_for_dataset(ir_dataset: str):
+    runs = set()
+    for r in Runs(ir_dataset).all_runs().values():
+        runs.update(r)
+
+    return {r: load_run_file(r) for r in tqdm(runs, f"Load runs for {ir_dataset}.")}
+
+
+def copy_trec_run(run: TrecRun):
+    ret = TrecRun()
+    ret.run_data = run.run_data.copy()
+
+    return ret
+
+
 def get_subcorpora(ir_dataset: str, subcorpus_file: Path):
     if not subcorpus_file.exists():
-        runs = set()
-        for r in Runs(ir_dataset).all_runs().values():
-            runs.update(r)
-
-        runs = {r: load_run_file(r) for r in tqdm(runs, f"Load runs for {ir_dataset}.")}
+        runs = runs_for_dataset(ir_dataset)
 
         sampling_approaches = [
             JudgmentPoolCorpusSampler(),
@@ -47,13 +58,15 @@ def get_subcorpora(ir_dataset: str, subcorpus_file: Path):
             assert len(runs_except_group) == len(runs) - len(runs_of_group)
 
             for sampling_approach in sampling_approaches:
-                ret[group][str(sampling_approach)] = sampling_approach.sample_corpus(ir_dataset, runs_except_group)
+                ret[group][str(sampling_approach)] = [
+                    i for i in sampling_approach.sample_corpus(ir_dataset, runs_except_group)
+                ]
 
         with gzip.open(subcorpus_file, "wt") as f:
             json.dump(ret, f, indent=2)
 
     with gzip.open(subcorpus_file, "rt") as f:
-        return json.read(f)
+        return json.load(f)
 
 
 def qrels_on_sub_corpus(documents: set[str], ir_dataset: str) -> TrecQrel:
@@ -82,6 +95,32 @@ def evaluation_on_sub_corpus(run: TrecRun, documents: set[str], ir_dataset: str)
 
 def run_experiment(ir_dataset: str, subcorpus_file: Path):
     subcorpora = get_subcorpora(ir_dataset, subcorpus_file)
+    runs = runs_for_dataset(ir_dataset)
+    team_to_run_names = Runs(ir_dataset).all_runs()
+    ret = {}
+
+    for team in tqdm(subcorpora, "Process subcorpora"):
+        ret[team] = {}
+        for subsampling_name, subsampling_corpus in subcorpora[team].items():
+            subsampling_corpus = set(subsampling_corpus)
+            leave_one_team_out_runs = {k: copy_trec_run(v) for k, v in runs.items()}
+            complete_corpus = set([i for i in subsampling_corpus])
+
+            for run_name in team_to_run_names[team]:
+                leave_one_team_out_runs[run_name] = filter_runs(leave_one_team_out_runs[run_name], subsampling_corpus)
+                complete_corpus.update(list(leave_one_team_out_runs[run_name].run_data["docid"].unique()))
+
+            ret[team][subsampling_name] = {}
+
+            # now evaluate on complete corpus vs. subsampling_corpus
+            for run_name, run in leave_one_team_out_runs.items():
+                ret[team][subsampling_name][run_name] = {
+                    "evaluation-with-post-judgments": evaluation_on_sub_corpus(run, complete_corpus, ir_dataset),
+                    "evaluation-without-post-judgments": evaluation_on_sub_corpus(run, subsampling_corpus, ir_dataset),
+                }
+
+    with gzip.open(Path("data") / "processed" / "experiment-evaluation.json.gz", "wt") as f:
+        json.dump(ret, f, indent=2)
 
 
 if __name__ == "__main__":
