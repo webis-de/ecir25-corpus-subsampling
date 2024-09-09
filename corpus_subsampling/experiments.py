@@ -99,6 +99,14 @@ def run_experiment(ir_dataset: str, subcorpus_file: Path):
     team_to_run_names = Runs(ir_dataset).all_runs()
     ret = {}
 
+    ground_truth_corpus = set()
+    for run in runs.values():
+        ground_truth_corpus.update(run.run_data['docid'].unique())
+    
+    ground_truth_evaluation = {}
+    for run_name, run in runs.items():
+        ground_truth_evaluation[run_name] = evaluation_on_sub_corpus(run, ground_truth_corpus, ir_dataset)
+
     for team in tqdm(subcorpora, "Process subcorpora"):
         ret[team] = {}
         for subsampling_name, subsampling_corpus in subcorpora[team].items():
@@ -117,6 +125,7 @@ def run_experiment(ir_dataset: str, subcorpus_file: Path):
                 ret[team][subsampling_name][run_name] = {
                     "evaluation-with-post-judgments": evaluation_on_sub_corpus(run, complete_corpus, ir_dataset),
                     "evaluation-without-post-judgments": evaluation_on_sub_corpus(run, subsampling_corpus, ir_dataset),
+                    "ground-truth-evaluation": ground_truth_evaluation
                 }
 
     with gzip.open(Path("data") / "processed" / "experiment-evaluation.json.gz", "wt") as f:
