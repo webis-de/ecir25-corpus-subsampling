@@ -2,11 +2,19 @@
 
 ## Development
 
+A dev container is prepared, if you have docker installed, just open this repo in VS Code which starts the environment in a docker container with requirements already installed.
 
 Run tests via:
 
 ```
-PYTHONPATH=. pytest
+pytest
+```
+
+Code quality via:
+```
+black .
+isort .
+flake8
 ```
 
 ### TODOS

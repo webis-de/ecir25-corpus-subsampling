@@ -21,7 +21,7 @@
     "trec-system-runs/trec18/web.adhoc": {
         "groups": {
             "yhoou": {"prefix": "input.yhoou"},
-            "wat": {"prefix": "input.wat"},
+            "wat": {"prefix": ["input.wat", "input.Wat"]},
             "uva": {"prefix": "input.uva"},
             "uog": {"prefix": "input.uog"},
             "umh": {"prefix": "input.UMHOO"},
@@ -95,7 +95,7 @@
             "utw": {"prefix": "input.utw"},
             "uog": {"prefix": "input.uog"},
             "srchvrs": {"prefix": "input.srchvrs"},
-            "qut": {"prefix": "input.qut"},
+            "qut": {"prefix": ["input.qut", "input.QUT"]},
             "lc": {"prefix": "input.lc"},
             "irra": {"prefix": "input.irra"},
             "ictnet": {"prefix": "input.ICTNET"},
@@ -162,7 +162,7 @@
         "groups": {
             "num": {"prefix": ["input.1", "input.2"]},
             "base": {"prefix": ["input.DLH", "input.TF_IDF", "input.BM25", "input.indri", "input.bert"]},
-            "cort": {"prefix": "input.CORT"},
+            "cort": {"prefix": "input.CoRT"},
             "dora": {"prefix": "input.DoRA"},
             "nle": {"prefix": "input.NLE"},
             "rmit": {"prefix": "input.RMIT"},
