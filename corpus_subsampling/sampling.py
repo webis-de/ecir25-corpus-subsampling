@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 import ir_datasets
+from pathlib import Path
 from trectools import TrecPoolMaker, TrecRun
 
 
@@ -53,7 +54,21 @@ class JudgmentPoolCorpusSampler(CorpusSampler):
         return "judgment-pool"
 
 
-class RunPoolCorpusSampler(JudgmentPoolCorpusSampler):
+class CompleteCorpusSampler(CorpusSampler):
+    def __init__(self, runs):
+        self.corpus = set()
+        for run in runs.values():
+            for doc_id in run.run_data["docid"]:
+                self.corpus.add(doc_id)
+
+    def sample_corpus(self, ir_datasets_id: str, runs: list[TrecRun]) -> set[str]:
+        return self.corpus
+
+    def __str__(self) -> str:
+        return "complete-corpus"
+
+
+class RunPoolCorpusSampler(CorpusSampler):
     def __init__(self, depth: int):
         """Create a pool of the passed depth for the passed runs as sampled corpus.
 
@@ -74,7 +89,7 @@ class RunPoolCorpusSampler(JudgmentPoolCorpusSampler):
         Returns:
             set[str]: The top-k pool of the runs as sampled corpus
         """
-        ret = super().sample_corpus(ir_datasets_id, runs)
+        ret = set()
         pool = TrecPoolMaker().make_pool(runs, strategy="topX", topX=self.depth).pool
 
         for docids in pool.values():
@@ -110,3 +125,20 @@ class ReRankCorpusSampler(RunPoolCorpusSampler):
             set[str]: The corpus that just re-ranks an initial baseline run.
         """
         return super().sample_corpus(ir_datasets_id, [self.run])
+
+
+class ReRankBM25CorpusSampler(ReRankCorpusSampler):
+    def __init__(self, depth: int):
+        from tira.rest_api_client import Client
+        self.tira = Client()
+        self.depth = depth
+
+    def sample_corpus(self, ir_datasets_id: str, runs: list[TrecRun]) -> set[str]:
+        from tira.tirex import IRDS_TO_TIREX_DATASET
+        run = Path(self.tira.get_run_output('ir-benchmarks/tira-ir-starter/BM25 Re-Rank (tira-ir-starter-pyterrier)', IRDS_TO_TIREX_DATASET[ir_datasets_id])) / 'run.txt'
+        self.run = TrecRun(run)
+
+        return super().sample_corpus(ir_datasets_id, runs)
+
+    def __str__(self) -> str:
+        return f"re-rank-top-{self.depth}-bm25"
