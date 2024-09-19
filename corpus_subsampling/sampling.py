@@ -1,3 +1,5 @@
+import gzip
+import json
 from abc import ABC, abstractmethod
 from pathlib import Path
 
@@ -152,3 +154,57 @@ class ReRankBM25CorpusSampler(ReRankCorpusSampler):
 
     def __str__(self) -> str:
         return f"re-rank-top-{self.depth}-bm25"
+
+
+class LoftCorpusSampler(CorpusSampler):
+    def __init__(self, target_size: int, random_documents: set[str] = None):
+        self.target_size = target_size
+        self.__random_documents = random_documents
+
+    def random_documents(self, ir_dataset_id: str):
+        if self.__random_documents:
+            return self.__random_documents.copy()
+
+        default_path = (
+            Path(__file__).parent.parent.resolve()
+            / "data"
+            / "processed"
+            / "random-documents"
+            / (ir_dataset_id.split("/")[0] + ".json.gz")
+        )
+
+        with gzip.open(default_path, "rt") as f:
+            return json.load(f)
+
+    def sample_corpus(self, ir_datasets_id: str, runs: list[TrecRun]) -> set[str]:
+        dataset = ir_datasets.load(ir_datasets_id)
+        qid_to_relevant_documents = {}
+        for qrel in dataset.qrels_iter():
+            if qrel.relevance <= 0:
+                continue
+            if qrel.query_id not in qid_to_relevant_documents:
+                qid_to_relevant_documents[qrel.query_id] = set()
+        ret = set()
+
+        document_added = True
+        while document_added and len(ret) < self.target_size:
+            document_added = False
+            for qid in qid_to_relevant_documents:
+                if len(qid_to_relevant_documents[qid]) <= 0:
+                    continue
+
+                doc = qid_to_relevant_documents[qid].pop()
+                document_added = True
+                ret.add(doc)
+                if len(ret) > self.target_size:
+                    break
+
+        random_docs = self.random_documents(ir_datasets_id)
+
+        while len(random_docs) > 0 and len(ret) < self.target_size:
+            ret.add(random_docs.pop())
+
+        return ret
+
+    def __str__(self) -> str:
+        return f"loft-{self.target_size}"
