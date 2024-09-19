@@ -1,6 +1,6 @@
 import unittest
 
-from corpus_subsampling.sampling import ReRankCorpusSampler, ReRankBM25CorpusSampler
+from corpus_subsampling.sampling import ReRankBM25CorpusSampler, ReRankCorpusSampler
 
 from .test_judgment_pool_corpus_sampler import (
     DATASET_ID_FOR_TEST,
@@ -25,7 +25,7 @@ class TestReRankCorpusSampler(unittest.TestCase):
         actual = sampler.sample_corpus(DATASET_ID_FOR_TEST, [])
 
         self.assertEqual(expected, actual)
-    
+
     def test_re_rank_bm25_corpus_reranker(self):
         expected = set(["FBIS4-57944", "FR940216-0-00216", "LA011890-0177"])
         sampler = ReRankBM25CorpusSampler(depth=1000)
@@ -35,4 +35,3 @@ class TestReRankCorpusSampler(unittest.TestCase):
         self.assertEqual(len(actual), 165165)
         for k in expected:
             self.assertTrue(k in actual)
-

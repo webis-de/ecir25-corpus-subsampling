@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 
 import ir_datasets
-from pathlib import Path
 from trectools import TrecPoolMaker, TrecRun
 
 
@@ -130,12 +130,22 @@ class ReRankCorpusSampler(RunPoolCorpusSampler):
 class ReRankBM25CorpusSampler(ReRankCorpusSampler):
     def __init__(self, depth: int):
         from tira.rest_api_client import Client
+
         self.tira = Client()
         self.depth = depth
 
     def sample_corpus(self, ir_datasets_id: str, runs: list[TrecRun]) -> set[str]:
         from tira.tirex import IRDS_TO_TIREX_DATASET
-        run = Path(self.tira.get_run_output('ir-benchmarks/tira-ir-starter/BM25 Re-Rank (tira-ir-starter-pyterrier)', IRDS_TO_TIREX_DATASET[ir_datasets_id])) / 'run.txt'
+
+        run = (
+            Path(
+                self.tira.get_run_output(
+                    "ir-benchmarks/tira-ir-starter/BM25 Re-Rank (tira-ir-starter-pyterrier)",
+                    IRDS_TO_TIREX_DATASET[ir_datasets_id],
+                )
+            )
+            / "run.txt"
+        )
         self.run = TrecRun(run)
 
         return super().sample_corpus(ir_datasets_id, runs)

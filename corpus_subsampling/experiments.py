@@ -1,23 +1,36 @@
 import gzip
 import json
+from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 
 import ir_datasets
 import pandas as pd
 from tqdm import tqdm
-from trectools import TrecEval, TrecQrel, TrecRun
+from trectools import TrecEval, TrecPoolMaker, TrecQrel, TrecRun
 
 from corpus_subsampling.run_files import IR_DATASET_IDS, Runs, filter_runs
-from corpus_subsampling.sampling import JudgmentPoolCorpusSampler, RunPoolCorpusSampler
+from corpus_subsampling.sampling import CompleteCorpusSampler, ReRankBM25CorpusSampler, RunPoolCorpusSampler
 
 RUN_FILE_CACHE = {}
+DEPTH = 1000
 
 
 def load_run_file(run_file_name: str) -> TrecRun:
     global RUN_FILE_CACHE
 
     if run_file_name not in RUN_FILE_CACHE:
-        RUN_FILE_CACHE[run_file_name] = TrecRun(run_file_name)
+        run = TrecRun(run_file_name).run_data
+        run = run.sort_values(["query", "score", "docid"], ascending=[True, False, False]).reset_index()
+
+        run = run.groupby("query")[["query", "docid", "score", "system"]].head(DEPTH)
+        run["q0"] = "Q0"
+
+        # Make sure that rank position starts by 1
+        run["rank"] = 1
+        run["rank"] = run.groupby("query")["rank"].cumsum()
+
+        RUN_FILE_CACHE[run_file_name] = TrecRun()
+        RUN_FILE_CACHE[run_file_name].run_data = run
 
     return RUN_FILE_CACHE[run_file_name]
 
@@ -42,10 +55,14 @@ def get_subcorpora(ir_dataset: str, subcorpus_file: Path):
         runs = runs_for_dataset(ir_dataset)
 
         sampling_approaches = [
-            JudgmentPoolCorpusSampler(),
+            # JudgmentPoolCorpusSampler(), ignore, is the same as depth=10
+            RunPoolCorpusSampler(depth=10),
+            RunPoolCorpusSampler(depth=25),
             RunPoolCorpusSampler(depth=50),
             RunPoolCorpusSampler(depth=100),
             RunPoolCorpusSampler(depth=1000),
+            CompleteCorpusSampler(runs),
+            ReRankBM25CorpusSampler(depth=1000),
         ]
 
         ret = {}
@@ -86,55 +103,145 @@ def qrels_on_sub_corpus(documents: set[str], ir_dataset: str) -> TrecQrel:
     return ret, skipped
 
 
-def evaluation_on_sub_corpus(run: TrecRun, documents: set[str], ir_dataset: str):
-    qrels, skipped = qrels_on_sub_corpus(documents, ir_dataset)
-    te = TrecEval(run, qrels)
+class Experiment:
+    def __init__(self, runs, runs_to_leave_out, depth, subsampling_corpus, subsampling_name, team, ir_dataset):
+        super().__init__()
+        self.runs = runs
+        self.runs_to_leave_out = runs_to_leave_out
+        self.depth = depth
+        self.subsampling_corpus = subsampling_corpus
+        self.subsampling_name = subsampling_name
+        self.team = team
+        self.ir_dataset = ir_dataset
+        self.ret = {}
 
-    return {"ndcg@10": te.get_ndcg(depth=10), "unjudged@10": te.get_unjudged(depth=10), "skipped_qrels": skipped}
+    def run(self):
+        self.ret = {}
+        leave_one_team_out_runs = {k: copy_trec_run(v) for k, v in self.runs.items()}
+
+        for run_name in self.runs_to_leave_out:
+            leave_one_team_out_runs[run_name] = filter_runs(leave_one_team_out_runs[run_name], self.subsampling_corpus)
+
+        evaluation_with_post_judgments = EvaluationOnSubcorpus(
+            trec_pool(leave_one_team_out_runs, self.depth), self.ir_dataset
+        )
+
+        for run_name in self.runs_to_leave_out:
+            leave_one_team_out_runs[run_name] = filter_runs(leave_one_team_out_runs[run_name], self.subsampling_corpus)
+
+        evaluation_without_post_judgments = EvaluationOnSubcorpus(
+            trec_pool(
+                {k: v for k, v in leave_one_team_out_runs.items() if k not in self.runs_to_leave_out}, self.depth
+            ),
+            self.ir_dataset,
+        )
+
+        self.ret = {"runs": {}, "corpus-size": len(self.subsampling_corpus)}
+
+        for run_name, run in leave_one_team_out_runs.items():
+            self.ret["runs"][run_name] = {
+                "evaluation-with-post-judgments": evaluation_with_post_judgments.evaluation_on_sub_corpus(run),
+                "evaluation-without-post-judgments": evaluation_without_post_judgments.evaluation_on_sub_corpus(run),
+            }
+        return self.ret, self.team, self.subsampling_name, self.runs_to_leave_out
 
 
-def run_experiment(ir_dataset: str, subcorpus_file: Path):
+class EvaluationOnSubcorpus:
+    def __init__(self, documents: set[str], ir_dataset: str):
+        self.qrels, self.skipped = qrels_on_sub_corpus(documents, ir_dataset)
+
+    def evaluation_on_sub_corpus(self, run: TrecRun):
+        te = TrecEval(run, self.qrels)
+
+        return {
+            "ndcg@10": te.get_ndcg(depth=10),
+            "ndcg@10-condensed": te.get_ndcg(depth=10, removeUnjudged=True),
+            "unjudged@10": te.get_unjudged(depth=10),
+            "skipped_qrels": self.skipped,
+        }
+
+
+def trec_pool(runs, depth):
+    runs = list(runs.values())
+    ret = set()
+    pool = TrecPoolMaker().make_pool(runs, strategy="topX", topX=depth).pool
+
+    for docids in pool.values():
+        ret.update(docids)
+
+    return ret
+
+
+def calculate_ground_truth_evaluation(ir_dataset):
+    runs = runs_for_dataset(ir_dataset)
+
+    evaluate_on_ground_truth_corpus = set()
+    for qrel in ir_datasets.load(ir_dataset).qrels_iter():
+        evaluate_on_ground_truth_corpus.add(qrel.doc_id)
+
+    ret = {}
+    evaluate_on_ground_truth_corpus = EvaluationOnSubcorpus(evaluate_on_ground_truth_corpus, ir_dataset)
+    for run_name, run in tqdm(runs.items(), "Do ground truth eval"):
+        ret[run_name] = evaluate_on_ground_truth_corpus.evaluation_on_sub_corpus(run)
+
+    return ret
+
+
+def run_experiment(ir_dataset: str, subcorpus_file: Path, eval_file: Path, depth: int = 10):
     subcorpora = get_subcorpora(ir_dataset, subcorpus_file)
+
+    if eval_file.exists():
+        with gzip.open(eval_file, "rt") as f:
+            return json.load(f)
+
     runs = runs_for_dataset(ir_dataset)
     team_to_run_names = Runs(ir_dataset).all_runs()
     ret = {}
 
-    ground_truth_corpus = set()
-    for run in runs.values():
-        ground_truth_corpus.update(run.run_data['docid'].unique())
-    
-    ground_truth_evaluation = {}
-    for run_name, run in runs.items():
-        ground_truth_evaluation[run_name] = evaluation_on_sub_corpus(run, ground_truth_corpus, ir_dataset)
+    ground_truth_evaluation = calculate_ground_truth_evaluation(ir_dataset)
+    ground_truth_evaluation_top_10 = {}
+    print("Prepare ground truth evaluation", flush=True)
+    evaluate_on_ground_truth_corpus = EvaluationOnSubcorpus(trec_pool(runs, depth), ir_dataset)
 
-    for team in tqdm(subcorpora, "Process subcorpora"):
-        ret[team] = {}
-        for subsampling_name, subsampling_corpus in subcorpora[team].items():
-            subsampling_corpus = set(subsampling_corpus)
-            leave_one_team_out_runs = {k: copy_trec_run(v) for k, v in runs.items()}
-            complete_corpus = set([i for i in subsampling_corpus])
+    for run_name, run in tqdm(runs.items(), "Do ground truth eval"):
+        ground_truth_evaluation_top_10[run_name] = evaluate_on_ground_truth_corpus.evaluation_on_sub_corpus(run)
 
-            for run_name in team_to_run_names[team]:
-                leave_one_team_out_runs[run_name] = filter_runs(leave_one_team_out_runs[run_name], subsampling_corpus)
-                complete_corpus.update(list(leave_one_team_out_runs[run_name].run_data["docid"].unique()))
+    with ProcessPoolExecutor(max_workers=12) as executor:
+        results = []
+        for team in subcorpora:
+            ret[team] = {}
+            for subsampling_name, subsampling_corpus in subcorpora[team].items():
+                subsampling_corpus = set(subsampling_corpus)
+                e = Experiment(
+                    runs, team_to_run_names[team], depth, subsampling_corpus, subsampling_name, team, ir_dataset
+                )
+                results += [executor.submit(e.run)]
 
-            ret[team][subsampling_name] = {}
+        for i in tqdm(results, f"LOGO for {ir_dataset}"):
+            result, team, subsampling_name, runs_to_remove = i.result()
+            for run_name, v in result["runs"].items():
+                v["is-in-leave-out-group"] = run_name in runs_to_remove
+                v["ground-truth-evaluation-top-10"] = ground_truth_evaluation_top_10[run_name]
+                v["ground-truth-evaluation"] = ground_truth_evaluation[run_name]
+            ret[team][subsampling_name] = result
 
-            # now evaluate on complete corpus vs. subsampling_corpus
-            for run_name, run in leave_one_team_out_runs.items():
-                ret[team][subsampling_name][run_name] = {
-                    "evaluation-with-post-judgments": evaluation_on_sub_corpus(run, complete_corpus, ir_dataset),
-                    "evaluation-without-post-judgments": evaluation_on_sub_corpus(run, subsampling_corpus, ir_dataset),
-                    "ground-truth-evaluation": ground_truth_evaluation
-                }
-
-    with gzip.open(Path("data") / "processed" / "experiment-evaluation.json.gz", "wt") as f:
+    with gzip.open(eval_file, "wt") as f:
         json.dump(ret, f, indent=2)
 
 
 if __name__ == "__main__":
-    for dataset in IR_DATASET_IDS:
+    # for dataset in IR_DATASET_IDS:
+    for dataset in [
+        "clueweb09/en/trec-web-2012",
+        "clueweb09/en/trec-web-2011",
+        "clueweb09/en/trec-web-2010",
+        "clueweb12/trec-web-2014",
+        "clueweb12/trec-web-2013",
+        "clueweb09/en/trec-web-2009",
+    ]:
+        print("Process", dataset)
         subcorpus_file = (
             Path("data") / "processed" / "sampled-corpora" / (dataset.replace("/", "-").lower() + ".json.gz")
         )
-        run_experiment(dataset, subcorpus_file)
+        eval_file = Path("data") / "processed" / ("evaluation-" + dataset.replace("/", "-").lower() + ".json.gz")
+        run_experiment(dataset, subcorpus_file, eval_file)
