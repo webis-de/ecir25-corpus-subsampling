@@ -1,8 +1,12 @@
 import unittest
 
+import ir_datasets
+
 from corpus_subsampling.sampling import LoftCorpusSampler
 
 from .test_judgment_pool_corpus_sampler import DATASET_ID_FOR_TEST
+
+judged_relevant = set([i.doc_id for i in ir_datasets.load(DATASET_ID_FOR_TEST).qrels_iter() if i.relevance > 0])
 
 
 class TestReRankCorpusSampler(unittest.TestCase):
@@ -12,8 +16,7 @@ class TestReRankCorpusSampler(unittest.TestCase):
         actual = sorted(list(actual))
 
         self.assertEqual(100, len(actual))
-        self.assertEqual(["FBIS3-14539", "FBIS3-1652", "FBIS3-21569"], actual[:3])
-        self.assertEqual(["LA113090-0118", "LA121490-0092", "LA121690-0080"], actual[-3:])
+        self.assertEqual(4, len([i for i in actual if i in judged_relevant]))
 
     def test_loft_sampling_robust04_size_1000(self):
         sampler = LoftCorpusSampler(target_size=1000)
@@ -21,8 +24,7 @@ class TestReRankCorpusSampler(unittest.TestCase):
         actual = sorted(list(actual))
 
         self.assertEqual(1000, len(actual))
-        self.assertEqual(["FBIS3-10170", "FBIS3-1079", "FBIS3-11194"], actual[:3])
-        self.assertEqual(["LA123090-0066", "LA123189-0136", "LA123189-0143"], actual[-3:])
+        self.assertEqual(31, len([i for i in actual if i in judged_relevant]))
 
     def test_loft_sampling_robust04_size_10000(self):
         sampler = LoftCorpusSampler(target_size=10000)
@@ -30,5 +32,12 @@ class TestReRankCorpusSampler(unittest.TestCase):
         actual = sorted(list(actual))
 
         self.assertEqual(10000, len(actual))
-        self.assertEqual(["FBIS3-10023", "FBIS3-10025", "FBIS3-10170"], actual[:3])
-        self.assertEqual(["LA123189-0136", "LA123189-0143", "LA123189-0177"], actual[-3:])
+        self.assertEqual(330, len([i for i in actual if i in judged_relevant]))
+
+    def test_loft_sampling_robust04_size_25000(self):
+        sampler = LoftCorpusSampler(target_size=30000)
+        actual = sampler.sample_corpus(DATASET_ID_FOR_TEST, [])
+        actual = sorted(list(actual))
+
+        self.assertEqual(25000, len(actual))
+        self.assertEqual(889, len([i for i in actual if i in judged_relevant]))

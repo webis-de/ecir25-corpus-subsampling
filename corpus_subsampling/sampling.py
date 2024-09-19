@@ -160,6 +160,7 @@ class LoftCorpusSampler(CorpusSampler):
     def __init__(self, target_size: int, random_documents: set[str] = None):
         self.target_size = target_size
         self.__random_documents = random_documents
+        self.depth = 10
 
     def random_documents(self, ir_dataset_id: str):
         if self.__random_documents:
@@ -176,14 +177,26 @@ class LoftCorpusSampler(CorpusSampler):
         with gzip.open(default_path, "rt") as f:
             return json.load(f)
 
+    def pool(self, runs: list[TrecRun]) -> set[str]:
+        ret = set()
+        pool = TrecPoolMaker().make_pool(runs, strategy="topX", topX=self.depth).pool
+
+        for docids in pool.values():
+            ret.update(docids)
+
+        return ret
+
     def sample_corpus(self, ir_datasets_id: str, runs: list[TrecRun]) -> set[str]:
         dataset = ir_datasets.load(ir_datasets_id)
+        complete_pool = self.pool(runs)
+
         qid_to_relevant_documents = {}
         for qrel in dataset.qrels_iter():
-            if qrel.relevance <= 0:
+            if qrel.relevance <= 0 or qrel.doc_id not in complete_pool:
                 continue
             if qrel.query_id not in qid_to_relevant_documents:
                 qid_to_relevant_documents[qrel.query_id] = set()
+            qid_to_relevant_documents[qrel.query_id].add(qrel.doc_id)
         ret = set()
 
         document_added = True
@@ -196,7 +209,7 @@ class LoftCorpusSampler(CorpusSampler):
                 doc = qid_to_relevant_documents[qid].pop()
                 document_added = True
                 ret.add(doc)
-                if len(ret) > self.target_size:
+                if len(ret) >= self.target_size:
                     break
 
         random_docs = self.random_documents(ir_datasets_id)
