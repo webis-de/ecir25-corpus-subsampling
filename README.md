@@ -17,6 +17,29 @@ isort .
 flake8
 ```
 
+## Carbon Footrpint Experiments
+
+The carbon footprint experiments first index the subcorpus and subsequently retrieve for all queries for this corpus against the index, storing the resulting run file while measuring the carbon footprint of the complete process from indexing to retrieval end-to-end.
+
+```
+wget https://cloud.uni-jena.de/s/X24iwDC4tEptsN2/download/materialized-subcorpora.zip
+```
+
+|Approach      |Type     |Responsible|
+|--------------|---------|-----------|
+|BM25          | Lexical | Maik      |
+|DirichletLM   | Lexical | Maik      |
+|TF-IDF        | Lexical | Maik      |
+|ANCE          | Dense   | Maik      |
+|Splaid        | Sparse  | Maik      |
+|ColBERT       | Late    |           |
+|Splade        |         |           |
+| ...          | ...     | ...       |
+| ...          | ...     | ...       |
+
+Approaches and how we can split them:
+
+
 ### TODOS
 
 - Use deduplicated versions of the corpora and also apply the other pre-processing steps as mentioned before.

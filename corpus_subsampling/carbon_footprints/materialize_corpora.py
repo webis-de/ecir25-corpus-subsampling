@@ -38,7 +38,7 @@ def resource_exists(resource):
 @click.argument("dataset_id", type=str)
 def materialize_corpus(dataset_id):
     subcorpora = load_subcorpora(dataset_id)
-    dataset = ir_datasets.load("dataset_id")
+    dataset = ir_datasets.load(dataset_id)
 
     for group_name, docs in subcorpora:
         target_resource = "materialized-corpora/" + dataset_id.replace("/", "-") + f"/{group_name}/"
@@ -49,10 +49,11 @@ def materialize_corpus(dataset_id):
         docs_store = dataset.docs_store()
 
         for doc in tqdm(docs, group_name):
-            documents += [{"docno": doc, "text": docs_store.load(doc).default_text(), "original_document": {}}]
+            documents += [{"docno": doc, "text": docs_store.get(doc).default_text(), "original_document": {}}]
 
+        (PROCESSED_RESOURCES / Path(target_resource)).mkdir(exist_ok=True, parents=True)
         for q in ['queries.jsonl', 'queries.xml', 'topics.xml']:
-            open(target_resource + '/' + q)
+            open(PROCESSED_RESOURCES / Path(target_resource) + '/' + q, 'w')
 
         with gzip.open(target_resource + '/documents.jsonl.gz', "wt") as f:
             for doc in documents:
