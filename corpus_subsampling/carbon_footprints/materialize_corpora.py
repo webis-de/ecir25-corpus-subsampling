@@ -41,8 +41,8 @@ def materialize_corpus(dataset_id):
     dataset = ir_datasets.load("dataset_id")
 
     for group_name, docs in subcorpora:
-        target_resource = "materialized-corpora/" + dataset_id.replace("/", "-") + f"/{group_name}/documents.jsonl.gz"
-        if resource_exists(target_resource):
+        target_resource = "materialized-corpora/" + dataset_id.replace("/", "-") + f"/{group_name}/"
+        if resource_exists(target_resource + '/documents.jsonl.gz'):
             continue
 
         documents = []
@@ -51,7 +51,10 @@ def materialize_corpus(dataset_id):
         for doc in tqdm(docs, group_name):
             documents += [{"docno": doc, "text": docs_store.load(doc).default_text(), "original_document": {}}]
 
-        with gzip.open(target_resource, "wt") as f:
+        for q in ['queries.jsonl', 'queries.xml', 'topics.xml']:
+            open(target_resource + '/' + q)
+
+        with gzip.open(target_resource + '/documents.jsonl.gz', "wt") as f:
             for doc in documents:
                 f.write(json.dumps(doc) + "\n")
 
