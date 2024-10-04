@@ -75,6 +75,7 @@ def materialize_corpus(dataset_id):
                 pass
 
             if inferences > 2500:
+                inferences = 0
                 persist_docs(target_resource, documents)
 
         persist_docs(target_resource, documents)
