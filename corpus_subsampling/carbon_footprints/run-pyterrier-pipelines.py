@@ -60,6 +60,9 @@ def main(ir_datasets_id, sample_strategy, retrieval):
     if not queries.exists():
         raise ValueError(f'Does not exist: {queries}')
 
+    if (run_dir / 'run.txt').exists():
+        return
+
     ensure_pyterrier_is_loaded()
     idx = index(docs, os.path.abspath(index_dir))
     retrieve(queries, idx, retrieval, run_dir)
