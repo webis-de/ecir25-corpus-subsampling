@@ -9,7 +9,12 @@ from tqdm import tqdm
 from trectools import TrecEval, TrecPoolMaker, TrecQrel, TrecRun
 
 from corpus_subsampling.run_files import IR_DATASET_IDS, Runs, filter_runs
-from corpus_subsampling.sampling import CompleteCorpusSampler, ReRankBM25CorpusSampler, RunPoolCorpusSampler
+from corpus_subsampling.sampling import (
+    CompleteCorpusSampler,
+    LoftCorpusSampler,
+    ReRankBM25CorpusSampler,
+    RunPoolCorpusSampler,
+)
 
 RUN_FILE_CACHE = {}
 DEPTH = 1000
@@ -55,6 +60,9 @@ def get_subcorpora(ir_dataset: str, subcorpus_file: Path):
         runs = runs_for_dataset(ir_dataset)
 
         sampling_approaches = [
+            ReRankBM25CorpusSampler(depth=1000),
+            LoftCorpusSampler(target_size=1000),
+            LoftCorpusSampler(target_size=10000),
             # JudgmentPoolCorpusSampler(), ignore, is the same as depth=10
             RunPoolCorpusSampler(depth=10),
             RunPoolCorpusSampler(depth=25),
@@ -62,7 +70,6 @@ def get_subcorpora(ir_dataset: str, subcorpus_file: Path):
             RunPoolCorpusSampler(depth=100),
             RunPoolCorpusSampler(depth=1000),
             CompleteCorpusSampler(runs),
-            ReRankBM25CorpusSampler(depth=1000),
         ]
 
         ret = {}
@@ -152,17 +159,30 @@ class EvaluationOnSubcorpus:
 
     def evaluation_on_sub_corpus(self, run: TrecRun):
         te = TrecEval(run, self.qrels)
+        ndcg_cut_10 = 0
+        ndcg_cut_10_condensed = 0
+        unjudged_at_10 = 0
+        try:
+            ndcg_cut_10 = te.get_ndcg(depth=10)
+            ndcg_cut_10_condensed = te.get_ndcg(depth=10, removeUnjudged=True)
+            unjudged_at_10 = te.get_unjudged(depth=10)
+        except:
+            pass
 
         return {
-            "ndcg@10": te.get_ndcg(depth=10),
-            "ndcg@10-condensed": te.get_ndcg(depth=10, removeUnjudged=True),
-            "unjudged@10": te.get_unjudged(depth=10),
+            "ndcg@10": ndcg_cut_10,
+            "ndcg@10-condensed": ndcg_cut_10_condensed,
+            "unjudged@10": unjudged_at_10,
             "skipped_qrels": self.skipped,
         }
 
 
 def trec_pool(runs, depth):
     runs = list(runs.values())
+    runs = [i for i in runs if len(i.run_data) > 0]
+    if len(runs) == 0:
+        raise ValueError("Could not find topics")
+
     ret = set()
     pool = TrecPoolMaker().make_pool(runs, strategy="topX", topX=depth).pool
 
@@ -190,6 +210,7 @@ def calculate_ground_truth_evaluation(ir_dataset):
 def run_experiment(ir_dataset: str, subcorpus_file: Path, eval_file: Path, depth: int = 10):
     subcorpora = get_subcorpora(ir_dataset, subcorpus_file)
 
+    return
     if eval_file.exists():
         with gzip.open(eval_file, "rt") as f:
             return json.load(f)
@@ -230,15 +251,16 @@ def run_experiment(ir_dataset: str, subcorpus_file: Path, eval_file: Path, depth
 
 
 if __name__ == "__main__":
-    # for dataset in IR_DATASET_IDS:
-    for dataset in [
-        "clueweb09/en/trec-web-2012",
-        "clueweb09/en/trec-web-2011",
-        "clueweb09/en/trec-web-2010",
-        "clueweb12/trec-web-2014",
-        "clueweb12/trec-web-2013",
-        "clueweb09/en/trec-web-2009",
-    ]:
+    # IR_DATASET_IDS = [
+    #    "clueweb09/en/trec-web-2012",
+    #    "clueweb09/en/trec-web-2011",
+    #    "clueweb09/en/trec-web-2010",
+    #    "clueweb12/trec-web-2014",
+    #    "clueweb12/trec-web-2013",
+    #    "clueweb09/en/trec-web-2009",
+    # ]
+
+    for dataset in IR_DATASET_IDS:
         print("Process", dataset)
         subcorpus_file = (
             Path("data") / "processed" / "sampled-corpora" / (dataset.replace("/", "-").lower() + ".json.gz")

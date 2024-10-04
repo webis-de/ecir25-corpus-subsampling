@@ -1,3 +1,7 @@
+rsync -avh --ignore-times data/unprocessed/ kibi9872@ssh.webis.de:/mnt/ceph/storage/data-tmp/current/kibi9872/conf25-corpus-subsampling/data/unprocessed/
+
+rsync -avh --ignore-times data/processed/ kibi9872@ssh.webis.de:/mnt/ceph/storage/data-tmp/current/kibi9872/conf25-corpus-subsampling/data/processed/
+
 # ECIR25 (Under Review): Corpus-Subsampling for Green and Robust Retrieval Evaluation
 
 ## Development
@@ -39,6 +43,21 @@ wget https://cloud.uni-jena.de/s/X24iwDC4tEptsN2/download/materialized-subcorpor
 
 Approaches and how we can split them:
 
+
+### Materialization of Corpora
+
+```
+export IR_DATASETS_HOME=/mnt/ceph/tira/state/ir_datasets/
+
+python3 corpus_subsampling/carbon_footprints/materialize_corpora.py clueweb09/en/trec-web-2012
+
+python3 corpus_subsampling/carbon_footprints/materialize_corpora.py clueweb12/trec-web-2014
+
+python3 corpus_subsampling/carbon_footprints/materialize_corpora.py msmarco-passage/trec-dl-2019/judged
+
+python3 corpus_subsampling/carbon_footprints/materialize_corpora.py disks45/nocr/trec-robust-2004
+
+```
 
 ### TODOS
 

@@ -8,6 +8,8 @@ try:
         from codecarbon import OfflineEmissionsTracker
         tracker = OfflineEmissionsTracker(country_iso_code="DEU", api_call_interval=2, measure_power_secs=1)
         tracker.start()
+        TODO Also monitor elapsed time and write this to somewhere
+        
         while True:
             sleep(20)
 finally:
