@@ -3,8 +3,8 @@
 set -e
 
 RETRIEVAL_SYSTEMS=("BM25" "DirichletLM" "PL2" "TF_IDF" "DPH" "Hiemstra_LM" "DLH" "DFIZ" "IFB2" "InB2")
-DATASETS=("msmarco-passage/trec-dl-2019/judged" "msmarco-passage/trec-dl-2020/judged" "disks45/nocr/trec-robust-2004")
-SUBCORPORA=("loft-1000" "re-rank-top-1000-bm25" "top-100-run-pool" "top-25-run-pool" "loft-10000" "top-10-run-pool" "top-1000-run-pool" "top-50-run-pool")
+DATASETS=("msmarco-passage/trec-dl-2019/judged" "msmarco-passage/trec-dl-2020/judged" "disks45/nocr/trec-robust-2004" "clueweb09/en/trec-web-2012" "clueweb12/trec-web-2014")
+SUBCORPORA=("loft-1000" "re-rank-top-1000-bm25" "top-100-run-pool" "top-25-run-pool" "loft-10000" "top-10-run-pool" "top-50-run-pool")
 
 for retrieval_system in "${RETRIEVAL_SYSTEMS[@]}"; do
     for dataset in "${DATASETS[@]}"; do
