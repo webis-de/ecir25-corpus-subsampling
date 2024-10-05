@@ -84,7 +84,7 @@ def doc_query(trec_id, index, length=30):
 @click.command('corpus-graph')
 @click.argument('ir_datasets_id')
 def main(ir_datasets_id):
-    output_file = Path(ir_datasets_id.replace('/', '-') + '.jsonl')
+    output_file = Path('../data/processed/corpus-graph/' + ir_datasets_id.replace('/', '-') + '.jsonl')
     dataset = ir_datasets.load(ir_datasets_id)
     index = {'clueweb09': 'webis_warc_clueweb09_003', 'clueweb12': 'webis_warc_clueweb12_011'}[ir_datasets_id.split('/')[0]]
 

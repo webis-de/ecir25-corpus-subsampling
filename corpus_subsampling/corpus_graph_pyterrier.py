@@ -27,7 +27,7 @@ def retrieval(ds):
 @click.command('corpus-graph')
 @click.argument('ir_datasets_id')
 def main(ir_datasets_id):
-    output_file = Path(ir_datasets_id.replace('/', '-') + '.jsonl')
+    output_file = Path('../data/processed/corpus-graph/' + ir_datasets_id.replace('/', '-') + '.jsonl')
     dataset = ir_datasets.load(ir_datasets_id)
     docs_store = dataset.docs_store()
 
