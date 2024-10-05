@@ -20,7 +20,10 @@ connections.configure(default={
 
 
 def tf_idf(t):
-    return t['term_freq'] * math.log(num_documents / t['doc_freq'])
+    doc_freq = 10
+    if 'doc_freq' in t:
+        doc_freq = t['doc_freq']
+    return t['term_freq'] * math.log(num_documents / doc_freq)
 
 def es_id(trec_id, index):
     results = Search().index(index).filter("term", warc_trec_id=trec_id).execute()
