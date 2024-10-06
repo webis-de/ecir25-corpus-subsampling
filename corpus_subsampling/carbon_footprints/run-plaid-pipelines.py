@@ -22,7 +22,7 @@ def retrieve(queries_file, index, wmodel, output_directory):
             l = json.loads(l)
             queries[l['qid']] = l['query']
     
-    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=output_directory) as tracker:
+    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=output_directory, tracking_mode='process') as tracker:
         from colbert.indexing.codecs.residual import ResidualCodec
         ResidualCodec.try_load_torch_extensions(True)
 
@@ -54,7 +54,7 @@ def index(documents_file, index_directory, model):
         for l in f:
             documents += [json.loads(l)]
 
-    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=index_directory) as tracker:
+    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=index_directory, tracking_mode='process') as tracker:
         collection = Collection.cast([ i['text'] for i in documents])
         indexer = Indexer(checkpoint=model, config=ColBERTConfig(bsize=64, nbits=1, root='/tmp/'))
 

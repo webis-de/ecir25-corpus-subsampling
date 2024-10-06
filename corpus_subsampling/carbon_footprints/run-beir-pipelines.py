@@ -20,7 +20,7 @@ def rank_all(documents_file, queries_file, output_directory, model):
     df_docs = pd.read_json(documents_file, lines=True)
     df_queries = pd.read_json(queries_file, lines=True)
 
-    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=output_directory) as tracker:
+    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=output_directory, tracking_mode='process') as tracker:
         sbert_model = models.SentenceBERT(model)
         model = DRES(sbert_model, batch_size=128, corpus_chunk_size=50000)
         corpus = {i['docno']:{'text': i['text']} for _, i in df_docs.iterrows()}

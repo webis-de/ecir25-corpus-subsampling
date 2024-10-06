@@ -14,7 +14,7 @@ def retrieve(queries, index, wmodel, output_directory):
     queries = pt.io.read_topics(queries, 'trecxml')
 
     
-    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=output_directory) as tracker:
+    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=output_directory, tracking_mode='process') as tracker:
         pipeline = pt.BatchRetrieve(index, wmodel=wmodel)
 
         result = pipeline(queries)
@@ -29,11 +29,11 @@ def index(documents_file, index_directory):
         for l in f:
             documents += [json.loads(l)]
 
-    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=index_directory) as tracker:
+    with OfflineEmissionsTracker(country_iso_code="DEU", output_dir=index_directory, tracking_mode='process') as tracker:
         documents = tqdm(documents, 'Load Documents')
 
         print(f'create new index at:\t{index_directory}')
-        return pt.IterDictIndexer(index_directory, meta= {'docno' : 50}).index(documents)
+        return pt.IterDictIndexer('/tmp/' + index_directory, meta= {'docno' : 50}).index(documents)
 
 RESOURCES = Path(__file__).parent / '..' / '..' / 'data' / 'processed' 
 
