@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import gzip
 import json
 from concurrent.futures import ProcessPoolExecutor
