@@ -7,6 +7,7 @@ import ir_datasets
 import pandas as pd
 from tqdm import tqdm
 from trectools import TrecEval, TrecPoolMaker, TrecQrel, TrecRun
+import click
 
 from corpus_subsampling.run_files import IR_DATASET_IDS, Runs, filter_runs
 from corpus_subsampling.sampling import (
@@ -209,8 +210,7 @@ def calculate_ground_truth_evaluation(ir_dataset):
 
 def run_experiment(ir_dataset: str, subcorpus_file: Path, eval_file: Path, depth: int = 10):
     subcorpora = get_subcorpora(ir_dataset, subcorpus_file)
-
-    return
+    print('SubCorpora are available')
     if eval_file.exists():
         with gzip.open(eval_file, "rt") as f:
             return json.load(f)
@@ -249,21 +249,16 @@ def run_experiment(ir_dataset: str, subcorpus_file: Path, eval_file: Path, depth
     with gzip.open(eval_file, "wt") as f:
         json.dump(ret, f, indent=2)
 
-
-if __name__ == "__main__":
-    # IR_DATASET_IDS = [
-    #    "clueweb09/en/trec-web-2012",
-    #    "clueweb09/en/trec-web-2011",
-    #    "clueweb09/en/trec-web-2010",
-    #    "clueweb12/trec-web-2014",
-    #    "clueweb12/trec-web-2013",
-    #    "clueweb09/en/trec-web-2009",
-    # ]
-
-    for dataset in IR_DATASET_IDS:
-        print("Process", dataset)
-        subcorpus_file = (
+@click.command('experiment')
+@click.argument('dataset', type=click.Choice(IR_DATASET_IDS))
+def main(dataset):
+    print("Process", dataset)
+    subcorpus_file = (
             Path("data") / "processed" / "sampled-corpora" / (dataset.replace("/", "-").lower() + ".json.gz")
         )
-        eval_file = Path("data") / "processed" / ("evaluation-" + dataset.replace("/", "-").lower() + ".json.gz")
-        run_experiment(dataset, subcorpus_file, eval_file)
+    eval_file = Path("data") / "processed" / ("evaluation-" + dataset.replace("/", "-").lower() + ".json.gz")
+    run_experiment(dataset, subcorpus_file, eval_file)
+
+
+if __name__ == "__main__":
+    main()
