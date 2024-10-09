@@ -31,11 +31,22 @@ def run_eval(run, truth_run, depth=10):
     te = TrecEval(run, qrels[truth_run])
     rbo_10_scores = []
     rbo_scores = []
+    rbo_10_scores_condensed = []
+    rbo_scores_condensed = []
+
     for qid, group in run.run_data.groupby("query"):
         r1 = group.sort_values("score", ascending=False)['docid'].values.tolist()
-        rbo_scores += [rbo.RankingSimilarity(rbo_ranks[truth_run][qid], r1).rbo()]
-        rbo_10_scores += [rbo.RankingSimilarity(rbo_ranks[truth_run][qid][:depth], r1).rbo()]
-    return {"Recall@10": te.get_recall(depth), "RBO@10": mean(rbo_10_scores), "RBO": mean(rbo_scores)}
+        truth_ranking = rbo_ranks[truth_run][qid]
+        rbo_scores += [rbo.RankingSimilarity(truth_ranking, r1).rbo()]
+        rbo_10_scores += [rbo.RankingSimilarity(truth_ranking[:depth], r1).rbo()]
+        actual_scores = set(rbo_ranks[truth_run][qid])
+        r1 = [i for i in r1 if i in actual_scores]
+        actual_scores = set(r1)
+        truth_ranking = [i for i in truth_ranking if i in actual_scores]
+        rbo_scores_condensed += [rbo.RankingSimilarity(truth_ranking, r1).rbo()]
+        rbo_10_scores_condensed += [rbo.RankingSimilarity(truth_ranking[:depth], r1).rbo()]
+
+    return {"Recall@10": te.get_recall(depth), "RBO@10": mean(rbo_10_scores), "RBO": mean(rbo_scores), "RBO@10 (condensed)": mean(rbo_10_scores_condensed), "RBO (condensed)": mean(rbo_scores_condensed)}
 
 def load_emissions(directory):
     ret = {}
