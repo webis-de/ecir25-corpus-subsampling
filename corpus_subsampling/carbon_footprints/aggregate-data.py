@@ -18,11 +18,10 @@ def run_eval(run, truth_run, depth=10):
         q.qrels_data = []
         rbo_ranks[truth_run] = {}
         for _, i in TrecRun(truth_run).run_data.iterrows():
-            if i['rank'] > depth:
-                continue
             if i["query"] not in rbo_ranks[truth_run]:
                 rbo_ranks[truth_run][i["query"]] = []
-            q.qrels_data += [{"query": i["query"], "q0": "Q0", "docid": i["docid"], "rel": 1}]
+            if i['rank'] <= depth:
+                q.qrels_data += [{"query": i["query"], "q0": "Q0", "docid": i["docid"], "rel": 1}]
             rbo_ranks[truth_run][i["query"]] += [i["docid"]]
 
         q.qrels_data = pd.DataFrame(q.qrels_data)
@@ -30,11 +29,13 @@ def run_eval(run, truth_run, depth=10):
 
     run = TrecRun(run)
     te = TrecEval(run, qrels[truth_run])
+    rbo_10_scores = []
     rbo_scores = []
     for qid, group in run.run_data.groupby("query"):
         r1 = group.sort_values("score", ascending=False)['docid'].values.tolist()
         rbo_scores += [rbo.RankingSimilarity(rbo_ranks[truth_run][qid], r1).rbo()]
-    return {"Recall@10": te.get_recall(depth), "RBO@10": mean(rbo_scores)}
+        rbo_10_scores += [rbo.RankingSimilarity(rbo_ranks[truth_run][qid][:depth], r1).rbo()]
+    return {"Recall@10": te.get_recall(depth), "RBO@10": mean(rbo_10_scores), "RBO": mean(rbo_scores)}
 
 def load_emissions(directory):
     ret = {}
