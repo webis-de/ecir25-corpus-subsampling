@@ -35,7 +35,7 @@ def dataset_id_to_corpus_sizes():
     if not os.path.isfile('../data/processed/carbon-footprints/dataset-sizes.json'):
         
         ret = {}
-        for dataset in tqdm(["msmarco-passage/trec-dl-2019/judged", "msmarco-passage/trec-dl-2020/judged", "disks45/nocr/trec-robust-2004", "clueweb09/en/trec-web-2012", "clueweb12/trec-web-2014"]):
+        for dataset in tqdm(["msmarco-passage/trec-dl-2019/judged", "msmarco-passage/trec-dl-2020/judged", "disks45/nocr/trec-robust-2004", "clueweb09/en/trec-web-2012", "clueweb12/trec-web-2014", "clueweb09/en/trec-web-2012", "clueweb09/en/trec-web-2012"]):
             ret[dataset] = {}
             with gzip.open(f'../data/processed/sampled-corpora/{dataset.replace("/", "-")}.json.gz') as f:
                 f = json.load(f)
@@ -92,7 +92,7 @@ def table_line(method):
     for _, i in df_eval.iterrows():
         if i['Sampling'] == method:
             f = lambda column: format(i.to_dict(), column)
-            return '--- & --- & --- & ' + f('Bi-Encoder (clueweb12)') + ' & ' + f('Late Interaction (clueweb12)') + ' & ' + f('Lexical (clueweb12)') + ' & ' + \
+            return f('Bi-Encoder (clueweb09)') + ' & ' + f('Late Interaction (clueweb09)') + ' & ' + f('Lexical (clueweb09)') + ' & ' + f('Bi-Encoder (clueweb12)') + ' & ' + f('Late Interaction (clueweb12)') + ' & ' + f('Lexical (clueweb12)') + ' & ' + \
                 f('Bi-Encoder (msmarco-passage)') + ' & ' + f('Late Interaction (msmarco-passage)') + ' & ' + f('Lexical (msmarco-passage)') + ' & ' + \
                 f('Bi-Encoder (disks45)') + ' & ' + f('Late Interaction (disks45)') + ' & ' + f('Lexical (disks45)')
     return ''
