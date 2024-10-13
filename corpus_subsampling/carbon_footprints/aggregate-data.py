@@ -81,7 +81,7 @@ def process_dataset(data_dir, dataset_id):
 @click.command('aggregate')
 @click.option('--data-dir', type=Path, default=Path('data/processed/carbon-footprints/'))
 @click.option('--output-file', type=Path, default=Path('data/processed/carbon-footprints/aggregated.jsonl'))
-@click.option('--datasets', type=list, default=['disks45/nocr/trec-robust-2004', 'msmarco-passage/trec-dl-2019/judged', 'msmarco-passage/trec-dl-2020/judged', 'clueweb12/trec-web-2014'])
+@click.option('--datasets', type=list, default=['disks45/nocr/trec-robust-2004', 'msmarco-passage/trec-dl-2019/judged', 'msmarco-passage/trec-dl-2020/judged', 'clueweb12/trec-web-2014', 'clueweb09/en/trec-web-2012'])
 def main(data_dir, datasets, output_file):
     ret = []
     for d in datasets:
