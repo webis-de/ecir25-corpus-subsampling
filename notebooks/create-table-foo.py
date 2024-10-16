@@ -3,10 +3,23 @@ from tqdm import tqdm
 from glob import glob
 import gzip
 import json
+from scipy.stats import ttest_ind
 
 PERCENTAGE_TOP_SYSTEMS = 0.75
 TRUTH_FIELD = 'ground-truth-evaluation-top-10'
 MEASURE = 'ndcg@10'
+
+def calculate_p_value(ret, dataset, method, target_feature):
+    truth = ret[dataset][method]['y_actual']
+    baseline_predictions = ret[dataset]['complete-corpus'][target_feature]
+    method_predictions = ret[dataset][method][target_feature]
+
+    actual_diff = [abs(i-j) for i,j in zip(truth, method_predictions)]
+    baseline_diff = [abs(i-j) for i,j in zip(truth, baseline_predictions)]
+    t_test = ttest_ind(actual_diff, baseline_diff)
+    print(t_test)
+    return t_test.pvalue
+
 
 def score_prediction_evaluation():
     from sklearn.metrics import root_mean_squared_error
@@ -48,7 +61,9 @@ def score_prediction_evaluation():
                 'Dataset': display_name,
                 'Subsampling': method,
                 'rmse': root_mean_squared_error(ret[dataset][method]['y_actual'], ret[dataset][method]['y_predicted']),
+                'rmse_pvalue': calculate_p_value(ret, dataset, method, 'y_predicted'),
                 'rmse (condensed)': root_mean_squared_error(ret[dataset][method]['y_actual'], ret[dataset][method]['condensed_y_predicted']),
+                'rmse (condensed)_pvalue': calculate_p_value(ret, dataset, method, 'condensed_y_predicted'),
                 'avg(actual_minus_predicted)': statistics.mean(ret[dataset][method]['actual_minus_predicted']),
                 'stdev(actual_minus_predicted)': statistics.stdev(ret[dataset][method]['actual_minus_predicted']),
         }
