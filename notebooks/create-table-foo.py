@@ -8,6 +8,7 @@ from scipy.stats import ttest_ind
 PERCENTAGE_TOP_SYSTEMS = 0.75
 TRUTH_FIELD = 'ground-truth-evaluation-top-10'
 MEASURE = 'ndcg@10'
+ALPHA_BONFERRONI_CORRECTED = 0.05/8
 
 def calculate_p_value(ret, dataset, method, target_feature):
     truth = ret[dataset][method]['y_actual']
@@ -50,7 +51,7 @@ def score_prediction_evaluation():
                     ret[display_name][method]['y_actual'] += [actual]
                     ret[display_name][method]['y_predicted'] += [predicted]
                     ret[display_name][method]['condensed_y_predicted'] += [predicted_condensed]
-                    ret[display_name][method]['actual_minus_predicted'] += [actual - predicted]
+                    ret[display_name][method]['predicted_minus_actual'] += [predicted - actual]
 
     evaluations = {}
 
@@ -64,8 +65,8 @@ def score_prediction_evaluation():
                 'rmse_pvalue': calculate_p_value(ret, dataset, method, 'y_predicted'),
                 'rmse (condensed)': root_mean_squared_error(ret[dataset][method]['y_actual'], ret[dataset][method]['condensed_y_predicted']),
                 'rmse (condensed)_pvalue': calculate_p_value(ret, dataset, method, 'condensed_y_predicted'),
-                'avg(actual_minus_predicted)': statistics.mean(ret[dataset][method]['actual_minus_predicted']),
-                'stdev(actual_minus_predicted)': statistics.stdev(ret[dataset][method]['actual_minus_predicted']),
+                'avg(actual_minus_predicted)': statistics.mean(ret[dataset][method]['predicted_minus_actual']),
+                'stdev(actual_minus_predicted)': statistics.stdev(ret[dataset][method]['predicted_minus_actual']),
         }
     return evaluations
 
@@ -77,9 +78,11 @@ def f(dataset, method, field):
         min_score = min(min_score, abs(evaluation[dataset][k][field]))
 
     val = evaluation[dataset][method][field]
+    p_value = evaluation[dataset][method][field + '_pvalue']
     style = '\\bfseries' if (min_score + 0.0001) >= abs(val) else ''
+    suffix = '' if p_value >= ALPHA_BONFERRONI_CORRECTED else '$^{*}$'
     
-    return "{" + style + (" {:.3f}".format(val)).replace('0.', '.') + "}"
+    return "{" + style + (" {:.3f}".format(val)).replace('0.', '.') + suffix + "}"
 
 def table_line(method):
     ret = []
