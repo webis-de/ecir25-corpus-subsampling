@@ -1,12 +1,11 @@
-rsync -avh --ignore-times data/unprocessed/ kibi9872@ssh.webis.de:/mnt/ceph/storage/data-tmp/current/kibi9872/conf25-corpus-subsampling/data/unprocessed/
-
-rsync -avh --ignore-times data/processed/ kibi9872@ssh.webis.de:/mnt/ceph/storage/data-tmp/current/kibi9872/conf25-corpus-subsampling/data/processed/
-
 # ECIR25 (Under Review): Corpus-Subsampling for Green and Robust Retrieval Evaluation
+
+This repository contains the code for corpus subsampling of to conduct retrieval experiments on huge web corpora like the ClueWebs at a reduced cost.
 
 ## Development
 
-A dev container is prepared, if you have docker installed, just open this repo in VS Code which starts the environment in a docker container with requirements already installed.
+We use a dev container that ships all the dependencies.
+If you have docker installed, just open this repo in VS Code which starts the environment in a docker container with requirements already installed.
 
 Run tests via:
 
@@ -25,24 +24,6 @@ flake8
 
 The carbon footprint experiments first index the subcorpus and subsequently retrieve for all queries for this corpus against the index, storing the resulting run file while measuring the carbon footprint of the complete process from indexing to retrieval end-to-end.
 
-```
-wget https://cloud.uni-jena.de/s/X24iwDC4tEptsN2/download/materialized-subcorpora.zip
-```
-
-|Approach      |Type     |Responsible|
-|--------------|---------|-----------|
-|BM25          | Lexical | Maik      |
-|DirichletLM   | Lexical | Maik      |
-|TF-IDF        | Lexical | Maik      |
-|ANCE          | Dense   | Maik      |
-|Splaid        | Sparse  | Maik      |
-|ColBERT       | Late    |           |
-|Splade        |         |           |
-| ...          | ...     | ...       |
-| ...          | ...     | ...       |
-
-Approaches and how we can split them:
-
 
 ### Materialization of Corpora
 
@@ -58,10 +39,6 @@ python3 corpus_subsampling/carbon_footprints/materialize_corpora.py msmarco-pass
 python3 corpus_subsampling/carbon_footprints/materialize_corpora.py disks45/nocr/trec-robust-2004
 
 ```
-
-### TODOS
-
-- Use deduplicated versions of the corpora and also apply the other pre-processing steps as mentioned before.
 
 ### Citation
 
