@@ -1,4 +1,4 @@
-# ECIR25 (Under Review): Corpus-Subsampling for Green and Robust Retrieval Evaluation
+# ECIR25: Corpus-Subsampling for Green and Robust Retrieval Evaluation
 
 This repository contains the code for corpus subsampling of to conduct retrieval experiments on huge web corpora like the ClueWebs at a reduced cost.
 
