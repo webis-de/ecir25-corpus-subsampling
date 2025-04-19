@@ -4,6 +4,7 @@ from tqdm import tqdm
 from pathlib import Path
 from glob import glob
 import json
+import time
 
 def load_allowlist():
     ret = []
@@ -65,7 +66,7 @@ def yield_record(bucket, file, start_offset, end_offset):
     with open(file, 'ab+') as f:
         f.write(response['Body'].read())
 
-@remote(num_cpus=0.1)
+@remote
 def stream_file(bucket, file, allow_list):
     data = stream_data_from_s3(bucket, file)
     from fastwarc.stream_io import GZipStream
@@ -88,7 +89,10 @@ def stream_file(bucket, file, allow_list):
 
     if start_offset is not None:
         yield_record(bucket, file, start_offset, start_offset*2)
+    return file
 
+def chunk_array(arr, chunk_size=50):
+    return [arr[i:i + chunk_size] for i in range(0, len(arr), chunk_size)]
 
 DATASETS = [
     'corpus-clueweb09-recompressed',
@@ -104,10 +108,18 @@ if __name__ == '__main__':
         for i in get_bucket_files(s3_client, dataset):
             DATASET_TO_FILES[dataset].add(i)
 
+    processed_files = set(Path("data/processed_files.txt").read_text().split('\n'))
+
     for dataset in DATASETS:
-        streams = []
         print(dataset, '->', len(DATASET_TO_FILES[dataset]))
-        for file in tqdm(DATASET_TO_FILES[dataset]):
-            streams.append(stream_file.remote(dataset, file, allowlist))
-        [get(i) for i in streams]
+        for chunk in tqdm(chunk_array(DATASET_TO_FILES[dataset])):
+            streams = []
+            for file in chunk:
+                if file not in processed_files:
+                    streams.append(stream_file.remote(dataset, file, allowlist))
+
+                if len(streams) > 0:
+                    with open("data/processed_files.txt", "at+") as f:
+                        for i in streams:
+                            f.write(get(i) + '\n')
 
