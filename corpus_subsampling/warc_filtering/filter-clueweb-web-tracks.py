@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#from ray import init, remote, get
+from ray import init, remote, get
 from tqdm import tqdm
 from pathlib import Path
 from glob import glob
@@ -25,9 +25,17 @@ def aws_credentials():
     return ret + ['http://s3.dw.webis.de:7480/']
 
 
+CREDS = None
+
 def create_s3_client():
     import boto3
-    KEY, SECRET, ENDPOINT = aws_credentials()
+    global CREDS
+    if CREDS is None:
+        KEY, SECRET, ENDPOINT = aws_credentials()
+        CREDS = [KEY, SECRET, ENDPOINT]
+    else:
+        KEY, SECRET, ENDPOINT = CREDS
+
     session = boto3.session.Session(KEY, SECRET)
 
     return session.client(
@@ -42,21 +50,6 @@ def get_bucket_files(s3_client, bucket):
     
     return [obj['Key'] for page in pages for obj in page['Contents']]
 
-def main_ray():
-    # Initialize Ray (and connect to cluster).
-    init()
-
-    # Define the square task.
-    @remote
-    def square(x: int) -> int:
-        return x * x
-
-    # Launch four parallel square tasks.
-    futures = [square.remote(i) for i in range(1_000)]
-
-    # Retrieve results.
-    print(sum(get(futures)))
-
 def stream_data_from_s3(bucket, file):
     s3_client = create_s3_client()
     response = s3_client.get_object(Bucket=bucket, Key=file)
@@ -66,12 +59,13 @@ def stream_data_from_s3(bucket, file):
 def yield_record(bucket, file, start_offset, end_offset):
     s3_client = create_s3_client()
     response = s3_client.get_object(Bucket=bucket, Key=file, Range=f"bytes={start_offset}-{end_offset}")
-    file = Path(file)
+    file = Path("/mnt/ceph/storage/data-in-progress/data-research/web-search/lsr-benchmark/clueweb09") / file
     if not file.is_file():
         file.parent.mkdir(exist_ok=True, parents=True)
     with open(file, 'ab+') as f:
         f.write(response['Body'].read())
 
+@remote(num_cpus=0.1)
 def stream_file(bucket, file, allow_list):
     data = stream_data_from_s3(bucket, file)
     from fastwarc.stream_io import GZipStream
@@ -102,6 +96,7 @@ DATASETS = [
 ]
 
 if __name__ == '__main__':
+    init()
     allowlist = load_allowlist()
     s3_client = create_s3_client()
     DATASET_TO_FILES = {i: set() for i in DATASETS}
@@ -110,7 +105,9 @@ if __name__ == '__main__':
             DATASET_TO_FILES[dataset].add(i)
 
     for dataset in DATASETS:
+        streams = []
         print(dataset, '->', len(DATASET_TO_FILES[dataset]))
         for file in tqdm(DATASET_TO_FILES[dataset]):
-            stream_file(dataset, file, allowlist)
-        
+            streams.append(stream_file.remote(dataset, file, allowlist))
+        [get(i) for i in streams]
+
