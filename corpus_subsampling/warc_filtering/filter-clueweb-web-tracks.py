@@ -76,9 +76,9 @@ def foo():
 
 def yield_record(bucket, file, start_offset, end_offset, trec_id):
     if not (OUT_DIR / file).is_file():
-        file.parent.mkdir(exist_ok=True, parents=True)
+        (OUT_DIR / file).parent.mkdir(exist_ok=True, parents=True)
 
-    with open(meta_file, 'at+') as f:
+    with open(meta_file(file), 'at+') as f:
         f.write(json.dumps({"trec_id": trec_id, "bucket": bucket, "file": file, "start_offset": start_offset, "end_offset": end_offset}) + '\n')
 
 
