@@ -60,7 +60,7 @@ def stream_data_from_s3(bucket, file):
 OUT_DIR = Path("/mnt/ceph/storage/data-in-progress/data-research/web-search/lsr-benchmark/clueweb09")
 
 def meta_file(file):
-    return OUT_DIR / (file.replace(".warc.gz", ".jsonl")
+    return OUT_DIR / (file.replace(".warc.gz", ".jsonl"))
 
 def foo():
     s3_client = create_s3_client()
