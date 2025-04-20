@@ -112,7 +112,7 @@ if __name__ == '__main__':
     for dataset in DATASETS:
         skipped = 0
         for i in get_bucket_files(s3_client, dataset):
-            if file not in processed_files:
+            if i not in processed_files:
                 DATASET_TO_FILES[dataset].add(i)
             else:
                 skipped += 1
