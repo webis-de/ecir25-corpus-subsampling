@@ -62,7 +62,7 @@ OUT_DIR = Path("/mnt/ceph/storage/data-in-progress/data-research/web-search/lsr-
 def meta_file(file):
     return OUT_DIR / (file.replace(".warc.gz", ".jsonl")
 
-def foo()
+def foo():
     s3_client = create_s3_client()
     response = s3_client.get_object(Bucket=bucket, Key=file, Range=f"bytes={start_offset}-{end_offset}")
 
