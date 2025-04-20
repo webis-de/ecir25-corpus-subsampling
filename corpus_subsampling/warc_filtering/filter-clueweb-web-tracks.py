@@ -5,6 +5,7 @@ from pathlib import Path
 from glob import glob
 import json
 import time
+import click
 
 def load_allowlist():
     ret = []
