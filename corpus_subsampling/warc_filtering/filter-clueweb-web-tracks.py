@@ -51,22 +51,22 @@ def get_bucket_files(s3_client, bucket):
     
     return [obj['Key'] for page in pages for obj in page['Contents']]
 
-def stream_data_from_s3(bucket, file):
+def stream_data_from_s3(dataset, file):
     s3_client = create_s3_client()
-    response = s3_client.get_object(Bucket=bucket, Key=file)
+    response = s3_client.get_object(Bucket=f"corpus-{dataset}-recompressed", Key=file)
 
     return response['Body']
 
-OUT_DIR = Path("/mnt/ceph/storage/data-in-progress/data-research/web-search/lsr-benchmark/clueweb09")
+OUT_DIR = Path("/mnt/ceph/storage/data-in-progress/data-research/web-search/lsr-benchmark/")
 
-def meta_file(file):
-    return OUT_DIR / (file.replace(".warc.gz", ".jsonl"))
+def meta_file(file, dataset):
+    return OUT_DIR / dataset / (file.replace(".warc.gz", ".jsonl"))
 
-def foo():
+def foo(bucket, file, dataset):
     s3_client = create_s3_client()
     response = s3_client.get_object(Bucket=bucket, Key=file, Range=f"bytes={start_offset}-{end_offset}")
 
-    file = OUT_DIR / file
+    file = OUT_DIR / dataset / file
 
     if not file.is_file():
         file.parent.mkdir(exist_ok=True, parents=True)
@@ -74,29 +74,29 @@ def foo():
     with open(file, 'ab+') as f:
         f.write(response['Body'].read())
 
-def yield_record(bucket, file, start_offset, end_offset, trec_id):
-    if not (OUT_DIR / file).is_file():
-        (OUT_DIR / file).parent.mkdir(exist_ok=True, parents=True)
+def yield_record(dataset, file, start_offset, end_offset, trec_id):
+    if not (OUT_DIR / dataset / file).is_file():
+        (OUT_DIR / dataset /file).parent.mkdir(exist_ok=True, parents=True)
 
-    with open(meta_file(file), 'at+') as f:
-        f.write(json.dumps({"trec_id": trec_id, "bucket": bucket, "file": file, "start_offset": start_offset, "end_offset": end_offset}) + '\n')
+    with open(meta_file(file, dataset), 'at+') as f:
+        f.write(json.dumps({"trec_id": trec_id, "bucket": f"corpus-{dataset}-recompressed", "file": file, "start_offset": start_offset, "end_offset": end_offset}) + '\n')
 
 
 @remote
-def stream_file(bucket, file, allow_list):
-    if (OUT_DIR / file).is_file():
-        (OUT_DIR / file).unlink()
-    if meta_file(file).is_file():
-        meta_file(file).unlink()
+def stream_file(dataset, file, allow_list):
+    if (OUT_DIR / dataset / file).is_file():
+        (OUT_DIR / dataset / file).unlink()
+    if meta_file(file, dataset).is_file():
+        meta_file(file, dataset).unlink()
 
-    data = stream_data_from_s3(bucket, file)
+    data = stream_data_from_s3(dataset, file)
     from fastwarc.stream_io import GZipStream
     from fastwarc.warc import ArchiveIterator
     start_offset = None
     prev_trec_id = None
     for record in ArchiveIterator(GZipStream(stream_data_from_s3(bucket, file))):
         if start_offset is not None:
-            yield_record(bucket, file, start_offset, record.stream_pos -1, prev_trec_id)
+            yield_record(dataset, file, start_offset, record.stream_pos -1, prev_trec_id)
 
         trec_id = None
         for k, v in record.headers:
@@ -112,7 +112,7 @@ def stream_file(bucket, file, allow_list):
             prev_trec_id = None
 
     if start_offset is not None:
-        yield_record(bucket, file, start_offset, start_offset*2, prev_trec_id)
+        yield_record(dataset, file, start_offset, start_offset*2, prev_trec_id)
     return file
 
 def chunk_array(arr, chunk_size=150):
@@ -123,32 +123,35 @@ DATASETS = [
 #    'corpus-clueweb12-recompressed',
 ]
 
-if __name__ == '__main__':
+
+@click.command()
+@click.argument("dataset", choices=["clueweb09", "clueweb12"])
+def main(dataset):
     init()
     allowlist = load_allowlist()
     processed_files = set((OUT_DIR / "processed_files.txt").read_text().split('\n'))
     s3_client = create_s3_client()
-    DATASET_TO_FILES = {i: set() for i in DATASETS}
-    for dataset in DATASETS:
-        skipped = 0
-        for i in get_bucket_files(s3_client, dataset):
-            if i not in processed_files:
-                DATASET_TO_FILES[dataset].add(i)
-            else:
-                skipped += 1
-        print(f"Skip {skipped} already processed files")
+    files = set
+    skipped = 0
+    for i in get_bucket_files(s3_client, dataset):
+        if i not in processed_files:
+            files.add(i)
+        else:
+            skipped += 1
+    print(f"Skip {skipped} already processed files")
 
 
-    for dataset in DATASETS:
-        print(dataset, '->', len(DATASET_TO_FILES[dataset]))
-        for chunk in tqdm(chunk_array(list(DATASET_TO_FILES[dataset]))):
-            streams = []
-            for file in chunk:
-                streams.append(stream_file.remote(dataset, file, allowlist))
+    print(dataset, '->', len(files))
+    for chunk in tqdm(chunk_array(list(files))):
+        streams = []
+        for file in chunk:
+            streams.append(stream_file.remote(dataset, file, allowlist))
 
-            if len(streams) > 0:
-                with open(OUT_DIR / "processed_files.txt", "at+") as f:
-                    for i in streams:
-                        f.write(get(i) + '\n')
-                        f.flush()
+        if len(streams) > 0:
+            with open(OUT_DIR / dataset / "processed_files.txt", "at+") as f:
+                for i in streams:
+                    f.write(get(i) + '\n')
+                    f.flush()
 
+if __name__ == '__main__':
+    main()
