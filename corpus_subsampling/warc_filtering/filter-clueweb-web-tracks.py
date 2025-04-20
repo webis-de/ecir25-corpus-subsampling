@@ -8,7 +8,7 @@ import time
 
 def load_allowlist():
     ret = []
-    for i in glob("data/*"):
+    for i in glob("data/*.json"):
         ret += json.loads(Path(i).read_text())
     print('->', len(ret))
     print('->', len(set(ret)))
@@ -57,10 +57,12 @@ def stream_data_from_s3(bucket, file):
 
     return response['Body']
 
+OUT_DIR = Path("/mnt/ceph/storage/data-in-progress/data-research/web-search/lsr-benchmark/clueweb09")
+
 def yield_record(bucket, file, start_offset, end_offset):
     s3_client = create_s3_client()
     response = s3_client.get_object(Bucket=bucket, Key=file, Range=f"bytes={start_offset}-{end_offset}")
-    file = Path("/mnt/ceph/storage/data-in-progress/data-research/web-search/lsr-benchmark/clueweb09") / file
+    file = OUT_DIR / file
     if not file.is_file():
         file.parent.mkdir(exist_ok=True, parents=True)
     with open(file, 'ab+') as f:
@@ -68,6 +70,8 @@ def yield_record(bucket, file, start_offset, end_offset):
 
 @remote
 def stream_file(bucket, file, allow_list):
+    if (OUT_DIR / file).is_file():
+        (OUT_DIR / file).unlink()
     data = stream_data_from_s3(bucket, file)
     from fastwarc.stream_io import GZipStream
     from fastwarc.warc import ArchiveIterator
@@ -91,7 +95,7 @@ def stream_file(bucket, file, allow_list):
         yield_record(bucket, file, start_offset, start_offset*2)
     return file
 
-def chunk_array(arr, chunk_size=50):
+def chunk_array(arr, chunk_size=150):
     return [arr[i:i + chunk_size] for i in range(0, len(arr), chunk_size)]
 
 DATASETS = [
@@ -102,24 +106,29 @@ DATASETS = [
 if __name__ == '__main__':
     init()
     allowlist = load_allowlist()
+    processed_files = set((OUT_DIR / "processed_files.txt").read_text().split('\n'))
     s3_client = create_s3_client()
     DATASET_TO_FILES = {i: set() for i in DATASETS}
     for dataset in DATASETS:
+        skipped = 0
         for i in get_bucket_files(s3_client, dataset):
-            DATASET_TO_FILES[dataset].add(i)
+            if file not in processed_files:
+                DATASET_TO_FILES[dataset].add(i)
+            else:
+                skipped += 1
+        print(f"Skip {skipped} already processed files")
 
-    processed_files = set(Path("data/processed_files.txt").read_text().split('\n'))
 
     for dataset in DATASETS:
         print(dataset, '->', len(DATASET_TO_FILES[dataset]))
-        for chunk in tqdm(chunk_array(DATASET_TO_FILES[dataset])):
+        for chunk in tqdm(chunk_array(list(DATASET_TO_FILES[dataset]))):
             streams = []
             for file in chunk:
-                if file not in processed_files:
-                    streams.append(stream_file.remote(dataset, file, allowlist))
+                streams.append(stream_file.remote(dataset, file, allowlist))
 
-                if len(streams) > 0:
-                    with open("data/processed_files.txt", "at+") as f:
-                        for i in streams:
-                            f.write(get(i) + '\n')
+            if len(streams) > 0:
+                with open(OUT_DIR / "processed_files.txt", "at+") as f:
+                    for i in streams:
+                        f.write(get(i) + '\n')
+                        f.flush()
 
