@@ -66,9 +66,21 @@ def meta_file(file, dataset):
     return OUT_DIR / dataset / (file.replace(".warc.gz", ".jsonl"))
 
 def bytes_of_warc_record_from_s3(dataset, file, start_offset, end_offset):
-    s3_client = create_s3_client()
-    ret = s3_client.get_object(Bucket=f"corpus-{dataset}-recompressed", Key=file, Range=f"bytes={start_offset}-{end_offset}")
-    return ret['Body'].read()
+    for i in range(5)
+        try:
+            s3_client = create_s3_client()
+            ret = s3_client.get_object(Bucket=f"corpus-{dataset}-recompressed", Key=file, Range=f"bytes={start_offset}-{end_offset}")
+            ret = ret['Body'].read()
+            if len(ret) < 1024:
+                raise ValueError('Response is too short.')
+            else:
+                return ret
+        except Exception as e:
+            if i == 4:
+                raise e
+            else:
+                time.sleep(5)
+
 
 def yield_record(dataset, file, start_offset, end_offset, trec_id):
     if not (OUT_DIR / dataset / file).is_file():
