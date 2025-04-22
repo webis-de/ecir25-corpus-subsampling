@@ -66,21 +66,31 @@ def meta_file(file, dataset):
     return OUT_DIR / dataset / (file.replace(".warc.gz", ".jsonl"))
 
 def bytes_of_warc_record_from_s3(dataset, file, start_offset, end_offset):
-    for i in range(5)
+    for i in range(5):
         try:
             s3_client = create_s3_client()
             ret = s3_client.get_object(Bucket=f"corpus-{dataset}-recompressed", Key=file, Range=f"bytes={start_offset}-{end_offset}")
             ret = ret['Body'].read()
             if len(ret) < 1024:
                 raise ValueError('Response is too short.')
-            else:
-                return ret
+
+            if len(ret) != ((end_offset - start_offset) +1):
+                raise ValueError(f"Response has unexpected length. Expected {(end_offset - start_offset) + 1}. Got {len(ret)}.")
+
+            return ret
         except Exception as e:
             if i == 4:
                 raise e
             else:
                 time.sleep(5)
 
+def bytes_of_warc_record_from_local_file(dataset, file, start_offset, end_offset):
+    with open(f"{OUT_DIR}/{dataset}/filtered/{file}", "rb") as f:
+        f.seek(start_offset)
+        ret = f.read((end_offset - start_offset) + 1)
+        if len(ret) != ((end_offset - start_offset) + 1):
+            raise ValueError("foo")
+        return ret
 
 def yield_record(dataset, file, start_offset, end_offset, trec_id):
     if not (OUT_DIR / dataset / file).is_file():
@@ -212,17 +222,46 @@ def step_02_persist_files(dataset):
     partitions = partition_access_files(files)
     persist_filtered_warcs(partitions, dataset)
 
+def step_03_check_warc_records(dataset):
+    files = []
+    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "rt") as docs_file:
+        for f in docs_file:
+            files.append(json.loads(f))
+
+    for f in tqdm(files):
+        bytes_in_s3 = bytes_of_warc_record_from_s3(dataset, f["source"]["file"], f["source"]["start_offset"], f["source"]["end_offset"])
+        bytes_in_local = bytes_of_warc_record_from_local_file(dataset, f["file"], f["start_offset"], f["end_offset"])
+        if len(bytes_in_s3) != len(bytes_in_local):
+            continue
+        expected_md5 = md5_sum(bytes_in_s3)
+        actual_md5 = md5_sum(bytes_in_local)
+        if expected_md5 != actual_md5:
+            continue
+
+        f["md5"] = expected_md5
+
+    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "wt") as docs_file:
+        for f in files:
+            docs_file.write(json.dumps(f) + '\n')
+
 
 @click.command()
-@click.argument("step", type=click.Choice(["01-access-files", "02-persist-files"]))
+@click.argument("step", type=click.Choice(["01-access-files", "02-persist-files", "03-check-warc-records"]))
 @click.argument("dataset", type=click.Choice(["clueweb09", "clueweb12"]))
-def main(step, dataset):
+@click.option("--output", default=OUT_DIR, required=False)
+def main(step, dataset, output):
+    global OUT_DIR
+    OUT_DIR = output
+
     if step == "01-access-files":
         print(f"Use s3 client {create_s3_client()}")
         step_01_access_files(dataset)
     elif step == "02-persist-files":
         print(f"Use s3 client {create_s3_client()}")
         step_02_persist_files(dataset)
+    elif step == "03-check-warc-records":
+        print(f"Use s3 client {create_s3_client()}")
+        step_03_check_warc_records(dataset)
     else:
         raise ValueError(f"Unknown step '{step}'.")
 
