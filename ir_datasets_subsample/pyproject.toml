@@ -1,0 +1,42 @@
+[project]
+name = "ir-datasets-subsample"
+authors = [
+    { name = "Maik Fröbe", email = "maik.froebe@uni-jena.de" },
+]
+description = "An extension for ir_datasets to process prepared corpus subsamples via the standard API of ir_datasets."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests = [
+]
+
+[project.urls]
+"Homepage" = "https://github.com/webis-de/ecir25-corpus-subsampling"
+"Bug Tracker" = "https://github.com/webis-de/ecir25-corpus-subsampling/issues"
+
+[build-system]
+requires = ["setuptools>=50", "setuptools_scm[toml]>=6.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.bandit.assert_used]
+skips = ["**/test_*.py"]
+
+[tool.pytest.ini_options]
+log_cli = "True"
