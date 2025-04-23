@@ -60,6 +60,11 @@ def stream_data_from_s3(dataset, file):
 
     return response['Body']
 
+def get_size_of_warc_file_from_s3(dataset, file):
+    s3_client = create_s3_client()
+    response = s3_client.head_object(Bucket=f"corpus-{dataset}-recompressed", Key=file)
+    return int(response['ContentLength'])
+
 OUT_DIR = Path("/mnt/ceph/storage/data-in-progress/data-research/web-search/lsr-benchmark/")
 
 def meta_file(file, dataset):
@@ -131,7 +136,7 @@ def stream_file(dataset, file, allow_list):
             prev_trec_id = None
 
     if start_offset is not None:
-        yield_record(dataset, file, start_offset, start_offset*2, prev_trec_id)
+        yield_record(dataset, file, start_offset, get_size_of_warc_file_from_s3(dataset, file), prev_trec_id)
     return file
 
 def chunk_array(arr, chunk_size=150):
@@ -220,13 +225,13 @@ def step_02_persist_files(dataset):
     partitions = partition_access_files(files)
     persist_filtered_warcs(partitions, dataset)
 
-def step_03_check_warc_records(dataset):
-    files = []
-    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "rt") as docs_file:
-        for f in docs_file:
-            files.append(json.loads(f))
 
+@remote
+def check_md5_of_warc_files(dataset, files):
     for f in tqdm(files):
+        if "md5" in f and f["md5"]:
+            continue
+
         bytes_in_s3 = bytes_of_warc_record_from_s3(dataset, f["source"]["file"], f["source"]["start_offset"], f["source"]["end_offset"])
         bytes_in_local = bytes_of_warc_record_from_local_file(dataset, f["file"], f["start_offset"], f["end_offset"])
         if len(bytes_in_s3) != len(bytes_in_local):
@@ -238,9 +243,33 @@ def step_03_check_warc_records(dataset):
 
         f["md5"] = expected_md5
 
+    return files
+
+def step_03_check_warc_records(dataset):
+    files = []
+    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "rt") as docs_file:
+        for f in docs_file:
+            files.append(json.loads(f))
+
+    streams = []
+    for chunk in tqdm(chunk_array(files, 1024*2)):
+        streams.append(check_md5_of_warc_files.remote(dataset, chunk))
+
+    shutil.copy(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", f"{OUT_DIR}/{dataset}/filtered/BACKUP-documents.jsonl.gz")
+
     with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "wt") as docs_file:
-        for f in files:
-            docs_file.write(json.dumps(f) + '\n')
+        for i in streams:
+            for f in get(i):
+                docs_file.write(json.dumps(f) + '\n')
+
+    with_md5, without_md5 = 0, 0
+    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "rt") as docs_file:
+        for f in docs_file:
+            if "md5" in json.loads(f):
+                with_md5 += 1
+            else:
+                without_md5 += 1
+    print(f"From {with_md5 + without_md5} files, {with_md5} have the expected md5 sum, {without_md5} dont have an md5 (re-run the script to fill the gaps).")
 
 
 @click.command()
