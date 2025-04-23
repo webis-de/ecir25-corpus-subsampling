@@ -71,8 +71,6 @@ def bytes_of_warc_record_from_s3(dataset, file, start_offset, end_offset):
             s3_client = create_s3_client()
             ret = s3_client.get_object(Bucket=f"corpus-{dataset}-recompressed", Key=file, Range=f"bytes={start_offset}-{end_offset}")
             ret = ret['Body'].read()
-            if len(ret) < 1024:
-                raise ValueError('Response is too short.')
 
             if len(ret) != ((end_offset - start_offset) +1):
                 raise ValueError(f"Response has unexpected length. Expected {(end_offset - start_offset) + 1}. Got {len(ret)}.")
