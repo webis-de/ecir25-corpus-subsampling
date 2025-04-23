@@ -278,7 +278,7 @@ def step_03_check_warc_records(dataset):
 @click.option("--output", default=OUT_DIR, required=False)
 def main(step, dataset, output):
     global OUT_DIR
-    OUT_DIR = output
+    OUT_DIR = Path(output)
 
     if step == "01-access-files":
         print(f"Use s3 client {create_s3_client()}")
