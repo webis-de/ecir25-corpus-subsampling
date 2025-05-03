@@ -77,7 +77,7 @@ def bytes_of_warc_record_from_s3(dataset, file, start_offset, end_offset):
             ret = s3_client.get_object(Bucket=f"corpus-{dataset}-recompressed", Key=file, Range=f"bytes={start_offset}-{end_offset}")
             ret = ret['Body'].read()
 
-            if len(ret) != ((end_offset - start_offset) +1):
+            if len(ret) <= (((end_offset - start_offset) +1) - 100):
                 raise ValueError(f"Response has unexpected length. Expected {(end_offset - start_offset) + 1}. Got {len(ret)}.")
 
             return ret
@@ -186,19 +186,29 @@ def partition_access_files(files):
         for l in lines:
             all_size += l['end_offset'] - l["start_offset"]
             ret[current_index].append(l)
-        if all_size > (1024*1024*1024):
+        if all_size > (250*1024*1024):
             all_size = 0
             current_index += 1
     return ret
 
 @remote
 def persist_warcs_into_file(output_file, dataset, files):
+    persisted_files = []
+
     with open(output_file, "wb") as output_warc:
         for f in files:
             warc_bytes = bytes_of_warc_record_from_s3(dataset, f["file"], f["start_offset"], f["end_offset"])
             md5 = md5_sum(warc_bytes)
             assert md5 == md5_sum(warc_bytes)
             output_warc.write(warc_bytes)
+            f_modified = f.copy()
+            f_modified["actual_from_warc"] = {"len": len(warc_bytes), "md5": md5}
+            persisted_files.append(f_modified)
+
+    with open(output_file + '.jsonl', 'wt') as output_meta:
+        for f_modified in persisted_files:
+            output_meta.write(json.dumps(f_modified) + '\n')
+
     return output_file
 
 def persist_filtered_warcs(partitions, dataset):
