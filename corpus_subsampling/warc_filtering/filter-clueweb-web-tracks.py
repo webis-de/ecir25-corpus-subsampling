@@ -222,6 +222,7 @@ def persist_warcs_into_file(output_file, dataset, files):
             persisted_files.append(f_modified)
             all_size += len(warc_bytes)
 
+    print(output_file + '.jsonl')
     with open(output_file + '.jsonl', 'wt') as output_meta:
         for f_modified in persisted_files:
             output_meta.write(json.dumps(f_modified) + '\n')
@@ -229,14 +230,17 @@ def persist_warcs_into_file(output_file, dataset, files):
     return output_file
 
 def persist_filtered_warcs(partitions, dataset):
+    from multiprocessing import Pool
+    pool = Pool(2*len(partitions))
     print(f"\nPersist {len(partitions)} partitions:\n\n")
-
+    jobs = []
     for partition in tqdm(partitions, "start partitions"):
         file_name = f"{dataset}-trec-filtered-0{partition}.warc.gz"
         output_warc_file = f"{OUT_DIR}/{dataset}/filtered/{file_name}"
+        jobs.append(pool.apply_async(persist_warcs_into_file, [output_warc_file, dataset, partitions[partition]]))
 
-        for f in partitions[partition]:
-            persist_warcs_into_file(output_warc_file, dataset, partitions[partition])
+    for job in jobs:
+        print(job.get(timeout=60*60*5))
 
 def step_02_persist_files(dataset):
     files = load_all_access_files(dataset)
