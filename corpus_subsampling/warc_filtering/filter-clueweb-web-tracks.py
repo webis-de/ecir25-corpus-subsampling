@@ -97,8 +97,8 @@ def bytes_of_warc_record_from_s3(dataset, file, start_offset, end_offset):
 def bytes_of_warc_record_from_local_file(dataset, file, start_offset, end_offset):
     with open(f"{OUT_DIR}/{dataset}/filtered/{file}", "rb") as f:
         f.seek(start_offset)
-        ret = f.read((end_offset - start_offset) + 1)
-        if len(ret) != ((end_offset - start_offset) + 1):
+        ret = f.read(end_offset - start_offset)
+        if len(ret) != (end_offset - start_offset):
             raise ValueError("foo")
         return ret
 
@@ -268,30 +268,85 @@ def check_md5_of_warc_files(dataset, files):
     return files
 
 def step_03_check_warc_records(dataset):
-    files = []
-    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "rt") as docs_file:
-        for f in docs_file:
-            files.append(json.loads(f))
+    expected_docs = load_allowlist()
+    expected_docs = set(i for i in expected_docs if dataset in i)
+    print(f"Have {len(expected_docs)} expected_docs")
 
-    streams = []
-    for chunk in tqdm(chunk_array(files, 1024*2)):
-        streams.append(check_md5_of_warc_files.remote(dataset, chunk))
+    doc_id_to_meta = {}
+    for meta_file in glob(f"{OUT_DIR}/{dataset}/filtered/*.warc.gz.jsonl"):
+        with open(meta_file) as f:
+            for l in f:
+                l = json.loads(l)
+                trec_id = l['trec_id']
+                l["actual_in_file"]["file"] = meta_file.split("/")[-1].replace(".jsonl", "")
+                assert trec_id not in doc_id_to_meta
+                doc_id_to_meta[trec_id] = l
 
-    shutil.copy(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", f"{OUT_DIR}/{dataset}/filtered/BACKUP-documents.jsonl.gz")
+    for trec_id in doc_id_to_meta.keys():
+        if trec_id not in expected_docs:
+            raise ValueError(trec_id)
 
-    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "wt") as docs_file:
-        for i in streams:
-            for f in get(i):
-                docs_file.write(json.dumps(f) + '\n')
+    missing_docs = set()
+    for trec_id in expected_docs:
+        if trec_id not in doc_id_to_meta:
+            missing_docs.add(trec_id)
 
-    with_md5, without_md5 = 0, 0
-    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "rt") as docs_file:
-        for f in docs_file:
-            if "md5" in json.loads(f):
-                with_md5 += 1
-            else:
-                without_md5 += 1
-    print(f"From {with_md5 + without_md5} files, {with_md5} have the expected md5 sum, {without_md5} dont have an md5 (re-run the script to fill the gaps).")
+    print(f"Have {len(missing_docs)} expected docs that are missing in the subsample")
+
+    docs = []
+    for trec_id in tqdm(doc_id_to_meta.keys()):
+        meta_data = doc_id_to_meta[trec_id]
+        assert meta_data["actual_from_warc"]["md5"] == meta_data["actual_in_file"]["md5"]
+        assert meta_data["actual_from_warc"]["len"] == meta_data["actual_in_file"]["len"]
+        bytes_local = bytes_of_warc_record_from_local_file(dataset, meta_data["actual_in_file"]["file"], meta_data["actual_in_file"]["start_offset"], meta_data["actual_in_file"]["end_offset"])
+        
+        assert len(bytes_local) == meta_data["actual_from_warc"]["len"], f'{trec_id} has unexpected length: {len(bytes_local)} vs {meta_data["actual_from_warc"]["len"]}'
+        assert md5_sum(bytes_local) == meta_data["actual_from_warc"]["md5"]
+        docs.append({
+            "trec_id": trec_id,
+            "file": meta_data["actual_in_file"]["file"],
+            "start_offset": meta_data["actual_in_file"]["start_offset"],
+            "end_offset": meta_data["actual_in_file"]["end_offset"],
+            "len": meta_data["actual_in_file"]["len"],
+            "md5": meta_data["actual_in_file"]["md5"],
+            "source": {
+                "s3-bucket": meta_data["bucket"],
+                "file": meta_data["file"],
+                "start_offset": meta_data["start_offset"],
+                "end_offset": meta_data["end_offset"],
+                "len": meta_data["actual_from_warc"]["len"],
+                "md5": meta_data["actual_from_warc"]["md5"]
+            }
+        })
+
+    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/document-offsets.jsonl.gz", "wt") as f:
+        for l in docs:
+            f.write(json.dumps(l) + '\n')
+
+    doc_id_to_meta = {}
+    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/document-offsets.jsonl.gz", "rt") as f:
+        for l in tqdm(f, "final check"):
+            l = json.loads(l)
+            assert l["source"]["md5"] == l["md5"]
+            assert l["source"]["len"] == l["len"]
+
+            bytes_local = bytes_of_warc_record_from_local_file(dataset, l["file"], l["start_offset"], l["end_offset"])
+            assert l["len"] == len(bytes_local)
+            assert l["md5"] == md5_sum(bytes_local)
+            assert l["trec_id"] not in doc_id_to_meta
+            doc_id_to_meta[l["trec_id"]] = l
+
+    for trec_id in doc_id_to_meta.keys():
+        if trec_id not in expected_docs:
+            raise ValueError(trec_id)
+
+    missing_docs = set()
+    for trec_id in expected_docs:
+        if trec_id not in doc_id_to_meta:
+            missing_docs.add(trec_id)
+
+    print(f"Have {len(missing_docs)} expected docs that are missing in the subsample")
+
 
 
 @click.command()
@@ -309,7 +364,6 @@ def main(step, dataset, output):
         print(f"Use s3 client {create_s3_client()}")
         step_02_persist_files(dataset)
     elif step == "03-check-warc-records":
-        print(f"Use s3 client {create_s3_client()}")
         step_03_check_warc_records(dataset)
     else:
         raise ValueError(f"Unknown step '{step}'.")
