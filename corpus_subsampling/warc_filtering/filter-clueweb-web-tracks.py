@@ -175,27 +175,36 @@ def load_all_access_files(dataset):
         ret.extend(glob(f"{OUT_DIR}/{dataset}/{d}/*.jsonl"))
     return ret
 
-def partition_access_files(files):
-    all_size = 0
-    current_index = 0
-    ret = {}
-    for f in tqdm(files, "Partition access files"):
-        lines = [json.loads(i) for i in Path(f).read_text().split('\n') if i]
-        if current_index not in ret:
-            ret[current_index] = []
-        for l in lines:
-            all_size += l['end_offset'] - l["start_offset"]
-            ret[current_index].append(l)
-        if all_size > (250*1024*1024):
-            all_size = 0
-            current_index += 1
-    return ret
+def partition_access_files(files, dataset):
+    result_file = Path(f'data/{dataset}-partitions.json.gz')
+    if not result_file.is_file():
+
+        all_size = 0
+        current_index = 0
+        ret = {}
+        for f in tqdm(files, "Partition access files"):
+            lines = [json.loads(i) for i in Path(f).read_text().split('\n') if i]
+            if current_index not in ret:
+                ret[current_index] = []
+            for l in lines:
+                all_size += l['end_offset'] - l["start_offset"]
+                ret[current_index].append(l)
+            if all_size > (250*1024*1024):
+                all_size = 0
+                current_index += 1
+
+        with gzip.open(result_file, 'wt') as f:
+            f.write(json.dumps(ret))
+
+    with gzip.open(result_file, 'rt') as f:
+        return json.loads(f.read())
 
 @remote
 def persist_warcs_into_file(output_file, dataset, files):
     persisted_files = []
 
     with open(output_file, "wb") as output_warc:
+        all_size = 0
         for f in files:
             warc_bytes = bytes_of_warc_record_from_s3(dataset, f["file"], f["start_offset"], f["end_offset"])
             md5 = md5_sum(warc_bytes)
@@ -203,7 +212,9 @@ def persist_warcs_into_file(output_file, dataset, files):
             output_warc.write(warc_bytes)
             f_modified = f.copy()
             f_modified["actual_from_warc"] = {"len": len(warc_bytes), "md5": md5}
+            f_modified["actual_in_file"] = {"len": len(warc_bytes), "md5": md5, "start_offset": all_size, "end_offset": all_size + len(warc_bytes)}
             persisted_files.append(f_modified)
+            all_size += len(warc_bytes)
 
     with open(output_file + '.jsonl', 'wt') as output_meta:
         for f_modified in persisted_files:
@@ -232,8 +243,8 @@ def persist_filtered_warcs(partitions, dataset):
 
 def step_02_persist_files(dataset):
     files = load_all_access_files(dataset)
-    partitions = partition_access_files(files)
-    persist_filtered_warcs(partitions, dataset)
+    partitions = partition_access_files(files, dataset)
+    #persist_filtered_warcs(partitions, dataset)
 
 
 @remote
