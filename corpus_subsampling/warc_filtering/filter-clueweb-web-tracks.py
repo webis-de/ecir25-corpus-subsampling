@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-from ray import init, remote, get
+try:
+    from ray import init, remote, get
+except:
+    print('no ray is available...')
+    def remote(func):
+        def no_ray_installed():
+            raise ValueError("no ray installed...")
+        return no_ray_installed
 from tqdm import tqdm
 from pathlib import Path
 from io import BytesIO
@@ -199,13 +206,12 @@ def partition_access_files(files, dataset):
     with gzip.open(result_file, 'rt') as f:
         return json.loads(f.read())
 
-@remote
 def persist_warcs_into_file(output_file, dataset, files):
     persisted_files = []
 
     with open(output_file, "wb") as output_warc:
         all_size = 0
-        for f in files:
+        for f in tqdm(files):
             warc_bytes = bytes_of_warc_record_from_s3(dataset, f["file"], f["start_offset"], f["end_offset"])
             md5 = md5_sum(warc_bytes)
             assert md5 == md5_sum(warc_bytes)
@@ -224,27 +230,18 @@ def persist_warcs_into_file(output_file, dataset, files):
 
 def persist_filtered_warcs(partitions, dataset):
     print(f"\nPersist {len(partitions)} partitions:\n\n")
-    init()
-    jobs = []
-    with gzip.open(f"{OUT_DIR}/{dataset}/filtered/documents.jsonl.gz", "wt") as output_file:
-        for partition in tqdm(partitions, "start partitions"):
-            offset = 0
-            file_name = f"{dataset}-trec-filtered-0{partition}.warc.gz"
-            output_warc_file = f"{OUT_DIR}/{dataset}/filtered/{file_name}"
 
-            for f in partitions[partition]:
-                size = f["end_offset"] - f["start_offset"]
-                meta = {"trec_id": f["trec_id"], "source": {k: f[k] for k in ["bucket", "file", "start_offset", "end_offset"]}, "file": file_name, "start_offset": offset, "end_offset": offset + size}
-                output_file.write(json.dumps(meta) + "\n")
-                offset += size + 1
+    for partition in tqdm(partitions, "start partitions"):
+        file_name = f"{dataset}-trec-filtered-0{partition}.warc.gz"
+        output_warc_file = f"{OUT_DIR}/{dataset}/filtered/{file_name}"
 
-            jobs.append(persist_warcs_into_file.remote(output_warc_file, dataset, partitions[partition]))
-    print([get(i) for i in jobs])
+        for f in partitions[partition]:
+            persist_warcs_into_file(output_warc_file, dataset, partitions[partition])
 
 def step_02_persist_files(dataset):
     files = load_all_access_files(dataset)
     partitions = partition_access_files(files, dataset)
-    #persist_filtered_warcs(partitions, dataset)
+    persist_filtered_warcs(partitions, dataset)
 
 
 @remote
