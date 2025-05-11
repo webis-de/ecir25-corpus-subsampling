@@ -14,6 +14,7 @@ from resiliparse.parse.html import HTMLTree
 from resiliparse.parse.encoding import detect_encoding
 from typing import NamedTuple
 from pathlib import Path
+import ir_datasets
 
 NAME = "corpus-subsamples"
 
@@ -50,6 +51,22 @@ def cached_zip_resource(url, md5):
     zipped = Cache(streamer, home_path() / NAME / url.split("/")[-1])
     return ZipExtractCache(zipped, home_path() / NAME / (url.split("/")[-1] + '-extracted'))
 
+TREC_TO_IRDS = {
+    "trec-18-web-subsample.json": "clueweb09/en/trec-web-2009",
+    "trec-19-web-subsample.json": "clueweb09/en/trec-web-2010",
+    "trec-20-web-subsample.json": "clueweb09/en/trec-web-2011",
+    "trec-21-web-subsample.json": "clueweb09/en/trec-web-2012",
+    "trec-22-web-subsample.json": "clueweb12/trec-web-2013",
+    "trec-23-web-subsample.json": "clueweb12/trec-web-2014",
+    "trec-28-misinfo-subsample.json": "clueweb12/b13/trec-misinfo-2019",
+}
+
+class ClueWebDocsStore():
+    def __init__(self, warc_subsample_docs):
+        self.warc_subsample_docs = warc_subsample_docs
+
+    def get(self, doc_id):
+        return self.warc_subsample_docs._load_doc(self.warc_subsample_docs.docs_dict()[doc_id])
 
 class WarcSubsampleDocuments(BaseDocs):
     def __init__(self, dlc, trec=None):
@@ -63,7 +80,7 @@ class WarcSubsampleDocuments(BaseDocs):
     def docs_iter(self):
         docs_dict = self.docs_dict()
         for k in docs_dict.keys():
-            yield self.__load_doc(docs_dict[k])
+            yield self._load_doc(docs_dict[k])
 
     def docs_dict(self):
         if self._docs_dict is None:
@@ -77,33 +94,31 @@ class WarcSubsampleDocuments(BaseDocs):
             self._docs_dict = {i["trec_id"]: i for i in docs if not allow_list or i["trec_id"] in allow_list}
         return self._docs_dict
  
-    def __load_doc(self, doc):
-        return ClueWebWarcDoc(doc["trec_id"], "title", "url", "plain_text")
+    def _load_doc(self, doc):
         with open(self.__extract() / doc["file"], "rb") as f:
              f.seek(doc["start_offset"])
              content = f.read(doc["end_offset"] - doc["start_offset"])
              # actual_md5sum = str(md5(content).hexdigest())
+             #raise ValueError(gzip.decompress(content))
              for document in ArchiveIterator(
                 BytesIO(content),
                 record_types=WarcRecordType.response,
-                parse_http=True,
-                auto_decode="all"
+                strict_mode=False
              ):
-                 doc_id = document.headers["WARC-TREC-ID"]
-                 assert doc_id == doc["trec_id"]
-                 url = document.headers['WARC-Target-URI']
-
                  html_bytes = document.reader.read()
+                 doc_id = document.headers["WARC-TREC-ID"]
+                 url = document.headers['WARC-Target-URI']
+                 assert doc_id == doc["trec_id"]
                  html_tree = HTMLTree.parse_from_bytes(html_bytes, detect_encoding(html_bytes))
-                 return ClueWebWarcDoc(doc_id, html_tree.title, url, extract_plain_text(html_tree, main_content=True))
+                 return ClueWebWarcDoc(doc_id, html_tree.title, url, extract_plain_text(html_tree, main_content=False))
              
-        raise ValueError("fooo")       
+        raise ValueError("This should not happen")       
 
     def docs_cls(self):
-        return self._cls
+        return ClueWebWarcDoc
 
     def docs_store(self, field='doc_id'):
-        raise ValueError("ToDo: Implement this")
+        return ClueWebDocsStore(self)
 
     def docs_namespace(self):
         raise ValueError("ToDo: Implement this")
@@ -114,6 +129,19 @@ class WarcSubsampleDocuments(BaseDocs):
     def docs_lang(self):
         raise ValueError("ToDo: Implement this")
 
+    def queries_iter(self):
+        if not self.trec:
+            raise ValueError("No queries available")
+        ds = ir_datasets.load(TREC_TO_IRDS[self.trec])
+        for i in ds.queries_iter():
+            yield i
+
+    def qrels_iter(self):
+        if not self.trec:
+            raise ValueError("No queries available")
+        ds = ir_datasets.load(TREC_TO_IRDS[self.trec])
+        for i in ds.qrels_iter():
+            yield i
 
 class SubsampledCorpus(Dataset):
    def __init__(self, zip_name, expected_md5, trec = None):
