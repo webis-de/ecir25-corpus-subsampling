@@ -20,6 +20,7 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
+    "resiliparse"
 ]
 dynamic = ["version"]
 

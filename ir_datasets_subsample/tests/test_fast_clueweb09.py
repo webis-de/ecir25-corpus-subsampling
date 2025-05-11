@@ -96,6 +96,10 @@ class TestFastClueWeb09(unittest.TestCase):
 
         self.assertEqual("1", actual.query_id)
 
+    def test_2010_trec_qrels_has_queries(self):
+        dataset = ir_datasets.load("corpus-subsamples/clueweb09/en/trec-web-2010")
+        self.assertTrue(dataset.has_queries())
+
     def test_2010_trec_qrels_can_be_loaded(self):
         dataset = ir_datasets.load("corpus-subsamples/clueweb09/en/trec-web-2010")
         actual = None

@@ -5,7 +5,7 @@ We prepare a small pip-installable extension for ir_datasets that allows to use 
 Install via:
 
 ```
-pip3 install -e .
+pip3 install .
 ```
 
 ## Incorporate the data

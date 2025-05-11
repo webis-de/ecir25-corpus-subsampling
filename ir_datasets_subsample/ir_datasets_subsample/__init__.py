@@ -1,7 +1,10 @@
 from ir_datasets import registry
 from ir_datasets.datasets.base import Dataset
+from ir_datasets.formats import TrecQrel
 from ir_datasets.formats.base import BaseDocs
 from ir_datasets.util import ZipExtractCache, home_path, Cache
+from ir_datasets.datasets.clueweb09 import TrecWebTrackQuery
+from ir_datasets.datasets.clueweb12 import MisinfoQuery
 from ir_datasets.util.download import RequestsDownload
 from hashlib import md5
 import os
@@ -117,6 +120,12 @@ class WarcSubsampleDocuments(BaseDocs):
     def docs_cls(self):
         return ClueWebWarcDoc
 
+    def queries_cls(self):
+        return TrecWebTrackQuery if "misinfo" not in self.trec else MisinfoQuery
+
+    def qrels_cls(self):
+        return TrecQrel
+
     def docs_store(self, field='doc_id'):
         return ClueWebDocsStore(self)
 
@@ -127,27 +136,39 @@ class WarcSubsampleDocuments(BaseDocs):
         return len(self.docs_dict())
 
     def docs_lang(self):
-        raise ValueError("ToDo: Implement this")
+        raise "en"
 
     def queries_iter(self):
-        if not self.trec:
+        if not self.has_queries():
             raise ValueError("No queries available")
         ds = ir_datasets.load(TREC_TO_IRDS[self.trec])
         for i in ds.queries_iter():
             yield i
 
+    def has_queries(self):
+        return self.trec and self.trec in TREC_TO_IRDS
+
     def qrels_iter(self):
-        if not self.trec:
-            raise ValueError("No queries available")
+        if not self.has_queries():
+            raise ValueError("No qrels available")
         ds = ir_datasets.load(TREC_TO_IRDS[self.trec])
         for i in ds.qrels_iter():
             yield i
 
 class SubsampledCorpus(Dataset):
-   def __init__(self, zip_name, expected_md5, trec = None):
-       docs = WarcSubsampleDocuments(ManualZipDownload(zip_name, expected_md5), trec)
-       self.trec = trec
-       super().__init__(docs)
+    def __init__(self, zip_name, expected_md5, trec = None):
+        docs = WarcSubsampleDocuments(ManualZipDownload(zip_name, expected_md5), trec)
+        self.trec = trec
+        super().__init__(docs)
+    
+    def has_queries(self):
+        return True
+
+    def __getattr__(self, attr):
+        if "queries_handler" in attr or "qrels_handler" in attr:
+            return self.trec is not None and (self.trec in TREC_TO_IRDS)
+        else:
+            return super().__getattr__(attr)
 
 def register_subsamples():
     if f"{NAME}/clueweb12" in registry:
