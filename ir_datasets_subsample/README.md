@@ -32,7 +32,7 @@ This runs only fast tests, see below to run all tests.
 
 ## Usage
 
-In general, you can use it as any ir_dataset (still, some methods might need to be implemented). For instance, the notebook [retrieval-example.ipynb](retrieval-example.ipynb) shows how retrieval experiments can be done. In general, the usage would be like:
+In general, you can use it as any ir_dataset (still, some methods might need to be improved). For instance, the notebook [retrieval-example.ipynb](retrieval-example.ipynb) shows how retrieval experiments can be done. In general, the usage would be like:
 
 ```
 from ir_datasets_subsample import register_subsamples
