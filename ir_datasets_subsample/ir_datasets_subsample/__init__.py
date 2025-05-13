@@ -17,7 +17,9 @@ from resiliparse.parse.html import HTMLTree
 from resiliparse.parse.encoding import detect_encoding
 from typing import NamedTuple
 from pathlib import Path
+from ir_datasets.indices import PickleLz4FullStore
 import ir_datasets
+from functools import cache
 
 NAME = "corpus-subsamples"
 
@@ -45,6 +47,7 @@ class ClueWebWarcDoc(NamedTuple):
     title: str
     url: str
     text: str
+    main_content: str
 
     def default_text(self):
         return self.title + " " + self.text
@@ -64,45 +67,66 @@ TREC_TO_IRDS = {
     "trec-28-misinfo-subsample.json": "clueweb12/b13/trec-misinfo-2019",
 }
 
-class ClueWebDocsStore():
-    def __init__(self, warc_subsample_docs):
-        self.warc_subsample_docs = warc_subsample_docs
+class ClueWebPickleDocsstore(PickleLz4FullStore):
+    def __init__(self, dlc, docs_iter_raw, allow_list):
+        super().__init__(
+            path=str(home_path() / "corpus-subsamples" / dlc.file.name.replace('.zip', '')) + '.pklz4',
+            init_iter_fn=docs_iter_raw,
+            data_cls=ClueWebWarcDoc,
+            lookup_field="doc_id",
+            index_fields=("doc_id",)
+        )
+        self.allow_list = allow_list
 
-    def get(self, doc_id):
-        return self.warc_subsample_docs._load_doc(self.warc_subsample_docs.docs_dict()[doc_id])
+    def __iter__(self):
+        ret = super().__iter__()
+        
+        if self.allow_list is not None:
+            return (i for i in ret if i.doc_id in self.allow_list)
+        else:
+            return ret
 
 class WarcSubsampleDocuments(BaseDocs):
     def __init__(self, dlc, trec=None):
        self.dlc = dlc
        self._docs_dict = None
        self.trec = trec
+       self.docs_store_processed = None
     
     def __extract(self):
         return ZipExtractCache(self.dlc, home_path() / "corpus-subsamples" / self.dlc.file.name.replace('.zip', '')).path() / self.dlc.file.name.replace('.zip', '')
 
+    @ir_datasets.util.use_docstore
     def docs_iter(self):
         docs_dict = self.docs_dict()
         for k in docs_dict.keys():
-            yield self._load_doc(docs_dict[k])
+            yield self._load_doc(k)
+
+        return self.docs_store().get(doc_id)
+
+    @cache
+    def allow_list(self):
+         if self.trec is not None:
+                topics_dir = cached_zip_resource('https://github.com/webis-de/ecir25-corpus-subsampling/raw/refs/heads/main/corpus_subsampling/warc_filtering/data/clueweb-subsamples-doc-ids.zip', '0b0d6c0c5168adffa20ffe0671d5ae40').path()
+                return set(json.loads((Path(topics_dir) / self.trec).read_text()))
 
     def docs_dict(self):
         if self._docs_dict is None:
-
-            allow_list = None
-            if self.trec is not None:
-                topics_dir = cached_zip_resource('https://github.com/webis-de/ecir25-corpus-subsampling/raw/refs/heads/main/corpus_subsampling/warc_filtering/data/clueweb-subsamples-doc-ids.zip', '0b0d6c0c5168adffa20ffe0671d5ae40').path()
-                allow_list = set(json.loads((Path(topics_dir) / self.trec).read_text()))
-            with gzip.open(self.__extract() / "document-offsets.jsonl.gz", "rt") as f:
-                docs = [json.loads(i) for i in f]
+            allow_list = self.allow_list()
+            docs = self.load_docs_dict()
             self._docs_dict = {i["trec_id"]: i for i in docs if not allow_list or i["trec_id"] in allow_list}
         return self._docs_dict
  
-    def _load_doc(self, doc):
+    def load_docs_dict(self):
+        with gzip.open(self.__extract() / "document-offsets.jsonl.gz", "rt") as f:
+            return [json.loads(i) for i in f]
+
+    def __process_doc_from_warc(self, doc):
         with open(self.__extract() / doc["file"], "rb") as f:
              f.seek(doc["start_offset"])
              content = f.read(doc["end_offset"] - doc["start_offset"])
-             # actual_md5sum = str(md5(content).hexdigest())
-             #raise ValueError(gzip.decompress(content))
+             actual_md5sum = str(md5(content).hexdigest())
+             assert actual_md5sum == doc["md5"], f"Error for document {doc['trec_id']}. I expected an md5 of {doc['md5']} but got {actual_md5sum}."
              for document in ArchiveIterator(
                 BytesIO(content),
                 record_types=WarcRecordType.response,
@@ -113,7 +137,7 @@ class WarcSubsampleDocuments(BaseDocs):
                  url = document.headers['WARC-Target-URI']
                  assert doc_id == doc["trec_id"]
                  html_tree = HTMLTree.parse_from_bytes(html_bytes, detect_encoding(html_bytes))
-                 return ClueWebWarcDoc(doc_id, html_tree.title, url, extract_plain_text(html_tree, main_content=False))
+                 return ClueWebWarcDoc(doc_id, html_tree.title, url, extract_plain_text(html_tree, main_content=False), extract_plain_text(html_tree, main_content=True))
              
         raise ValueError("This should not happen")       
 
@@ -127,7 +151,16 @@ class WarcSubsampleDocuments(BaseDocs):
         return TrecQrel
 
     def docs_store(self, field='doc_id'):
-        return ClueWebDocsStore(self)
+        if self.docs_store_processed is None:
+            
+            def docs_iter_raw():
+                docs_dict = self.load_docs_dict()
+                for k in docs_dict:
+                    yield self.__process_doc_from_warc(k)
+
+            self.docs_store_processed = ClueWebPickleDocsstore(self.dlc, docs_iter_raw, self.allow_list())
+
+        return self.docs_store_processed
 
     def docs_namespace(self):
         raise ValueError("ToDo: Implement this")
