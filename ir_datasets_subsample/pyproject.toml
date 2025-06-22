@@ -20,7 +20,8 @@ classifiers = [
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "resiliparse"
+    "resiliparse",
+    "ir_datasets"
 ]
 dynamic = ["version"]
 
