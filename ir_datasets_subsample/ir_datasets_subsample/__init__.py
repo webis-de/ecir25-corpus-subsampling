@@ -10,16 +10,13 @@ from hashlib import md5
 import os
 import gzip
 import json
-from fastwarc import ArchiveIterator, WarcRecordType
 from io import BytesIO
-from resiliparse.extract.html2text import extract_plain_text
-from resiliparse.parse.html import HTMLTree
-from resiliparse.parse.encoding import detect_encoding
 from typing import NamedTuple
 from pathlib import Path
 from ir_datasets.indices import PickleLz4FullStore
 import ir_datasets
 from functools import cache
+from ir_datasets_subsample.reformatted_corpora import register_reformatted_subsamples
 
 NAME = "corpus-subsamples"
 
@@ -122,6 +119,11 @@ class WarcSubsampleDocuments(BaseDocs):
             return [json.loads(i) for i in f]
 
     def __process_doc_from_warc(self, doc):
+        from fastwarc import ArchiveIterator, WarcRecordType
+        from resiliparse.extract.html2text import extract_plain_text
+        from resiliparse.parse.html import HTMLTree
+        from resiliparse.parse.encoding import detect_encoding
+
         with open(self.__extract() / doc["file"], "rb") as f:
              f.seek(doc["start_offset"])
              content = f.read(doc["end_offset"] - doc["start_offset"])
@@ -206,6 +208,8 @@ class SubsampledCorpus(Dataset):
 def register_subsamples():
     if f"{NAME}/clueweb12" in registry:
         return
+
+    register_reformatted_subsamples()
 
     registry.register(f"{NAME}/clueweb09", SubsampledCorpus("clueweb09-subcorpus.zip", "679c274cd18a84ac86bd418d9dd15e49"))
     registry.register(f"{NAME}/clueweb09/en/trec-web-2009", SubsampledCorpus("clueweb09-subcorpus.zip", "679c274cd18a84ac86bd418d9dd15e49", "trec-18-web-subsample.json"))

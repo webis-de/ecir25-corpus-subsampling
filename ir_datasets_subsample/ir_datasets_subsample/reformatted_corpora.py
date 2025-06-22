@@ -1,10 +1,8 @@
 from ir_datasets.util import ZipExtractCache, ZipExtract, GzipExtract, home_path, Cache, _DownloadConfig
 from ir_datasets import registry
-from ir_datasets.formats.base import BaseDocs
 from ir_datasets.formats import TrecQrels, JsonlQueries, JsonlDocs, TrecQrels
 from ir_datasets.datasets.base import Dataset
 from pathlib import Path
-import zipfile
 from typing import NamedTuple
 
 DOWNLOAD_CONTENTS = {
@@ -27,14 +25,6 @@ DOWNLOAD_CONTENTS = {
 DownloadConfig = _DownloadConfig(contents=DOWNLOAD_CONTENTS)
 
 
-class JsonlDoc(NamedTuple):
-    doc_id: str
-    text: str
-
-    def default_text(self):
-        return self.text
-
-
 class ReformattedDataset(Dataset):
     def __init__(self, dlc):
         docs = JsonlDocs(Cache(GzipExtract(ZipExtract(dlc["inputs"], 'corpus.jsonl.gz')), Path(dlc["inputs"]._cache_path.replace(".zip", "-extracted") + '-documents.jsonl')), mapping={"doc_id": "docno", "text": "text"})
@@ -45,7 +35,6 @@ class ReformattedDataset(Dataset):
 
 NAME = "corpus-subsamples"
 
-help(ZipExtractCache)
 
 def register_reformatted_subsamples():
     if f"{NAME}/trec-rag-2024" in registry:
@@ -54,4 +43,3 @@ def register_reformatted_subsamples():
     for corpus in DOWNLOAD_CONTENTS.keys():
         dlc = DownloadConfig.context(corpus, home_path() / NAME / corpus)
         registry.register(f"{NAME}/{corpus}", ReformattedDataset(dlc))
-
