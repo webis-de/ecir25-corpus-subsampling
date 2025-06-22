@@ -5,7 +5,26 @@ We prepare a small pip-installable extension for ir_datasets that allows to use 
 Install via:
 
 ```
-pip3 install .
+pip3 install 'git+https://github.com/webis-de/ecir25-corpus-subsampling.git#subdirectory=ir_datasets_subsample'
+```
+
+## Usage
+
+In general, you can use it as any ir_dataset (still, some methods might need to be improved). For instance:
+
+- the notebook [retrieval-example-rag-2024.ipynb](retrieval-example-rag-2024.ipynb) shows some retrieval experiments for TREC-RAG 2024.
+- the notebook [retrieval-example.ipynb](retrieval-example.ipynb) shows some retrieval experiments for the ClueWebs.
+
+
+In general, the usage would be like:
+
+```
+from ir_datasets_subsample import register_subsamples
+import ir_datasets
+
+register_subsamples()
+dataset = ir_datasets.load("corpus-subsamples/trec-rag-2024")
+dataset.docs_iter()
 ```
 
 ## Incorporate the data
@@ -25,29 +44,6 @@ Next, download the `clueweb09-subcorpus.zip` and `clueweb12-subcorpus.zip` files
 Ensure that everything works as expected:
 
 ```
-pytest tests/test_fast_*
-```
-
-This runs only fast tests, see below to run all tests.
-
-## Usage
-
-In general, you can use it as any ir_dataset (still, some methods might need to be improved). For instance, the notebook [retrieval-example.ipynb](retrieval-example.ipynb) shows how retrieval experiments can be done. In general, the usage would be like:
-
-```
-from ir_datasets_subsample import register_subsamples
-import ir_datasets
-
-register_subsamples()
-dataset = ir_datasets.load("corpus-subsamples/clueweb12")
-dataset.docs_iter()
-```
-
-## Run complete test suite (slow)
-
-you can run the full test suite (takes a while as all documents are parsed repeatedly) via:
-
-```
-pytest tests
+pytest .
 ```
 
