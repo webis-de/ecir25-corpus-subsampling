@@ -96,10 +96,10 @@ class WarcSubsampleDocuments(BaseDocs):
     @ir_datasets.util.use_docstore
     def docs_iter(self):
         docs_dict = self.docs_dict()
-        for k in docs_dict.keys():
-            yield self._load_doc(k)
+        docs_store = self.docs_store()
 
-        return self.docs_store().get(doc_id)
+        for k in docs_dict.keys():
+            yield docs_store.get(k)
 
     @cache
     def allow_list(self):
